@@ -1,0 +1,8 @@
+<mod_io>
+<max_process>300</max_process>
+<stable_process>500</stable_process>
+<http_port>8802</http_port>
+<cache_adr>localhost</cache_adr>
+<cache_port>8803</cache_port>
+<resv_buf>512</resv_buf>
+</mod_io>
