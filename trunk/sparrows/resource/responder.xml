@@ -1,0 +1,16 @@
+<responder>
+	<port>8803</port>
+	<mods>
+		<mod_static path="mod_static.so">
+			<dir>
+				<dir loc="/"/>
+			</dir>
+			<type>
+				<type dot=".htm"/>
+				<type dot=".html"/>
+				<type dot=".jpg"/>
+				<type dot=".png"/>
+			</dot>
+		</mod_static>
+	</mods>
+</responder>
