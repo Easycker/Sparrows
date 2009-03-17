@@ -3,6 +3,7 @@
 
 #include <cda/c_string.h>
 #include <cda/c_define.h>
+#include <stdint.h>
 
 typedef enum request_type
 {
@@ -25,5 +26,7 @@ HTTP_REQUEST* request_Create(HTTP_REQUEST *request);
 HTTP_REQUEST* request_Analysis(HTTP_REQUEST *request,C_ARRAY CHAR_* const string);
 
 BOOL_ request_Send(HTTP_REQUEST *request,int fd);
+
+unsigned char elf_Tinyhash(C_STRING const string);
 
 #endif

@@ -70,3 +70,24 @@ BOOL_ request_Send(HTTP_REQUEST *request,int fd)
 {
 	
 };
+
+unsigned char elf_Tinyhash(C_STRING const string)
+{
+	uint32_t hash=0;
+	uint32_t x=0 ;
+	char *op;
+	size_t len;
+
+	len=(array_Length(string)+1)*sizeof(CHAR_);
+	op=(char*)string;
+	while(len--)
+	{
+		hash=(hash<<4)+(*op++);
+		if((x=hash&0xF0000000L)!=0)
+		{
+			hash^= (x>>24);
+			hash&=~x;
+		};
+	};
+	return (unsigned char)(hash&255);
+};

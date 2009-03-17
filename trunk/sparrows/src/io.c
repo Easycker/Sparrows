@@ -4,7 +4,6 @@ IO_CONFIG* io_Config(IO_CONFIG *config,FILE *fp)
 {
 	XML_DOC doc;
 	XML_NODE *config_root;
-	XML_NODE *node;
 	C_STRING cache;
 
 	cache=string_Create();

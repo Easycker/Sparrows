@@ -363,7 +363,7 @@ Copyright (C) 2008 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/home/more/Documents/workspace/smarthttpd-0.1'
+ac_pwd='/home/more/Documents/workspace/sparrows'
 srcdir='.'
 INSTALL='/bin/install -c'
 MKDIR_P='/bin/mkdir -p'
@@ -555,7 +555,7 @@ S["CFLAGS"]="-g -O2"
 S["CC"]="gcc"
 S["am__untar"]="${AMTAR} xf -"
 S["am__tar"]="${AMTAR} chof - \"$$tardir\""
-S["AMTAR"]="${SHELL} /home/more/Documents/workspace/smarthttpd-0.1/missing --run tar"
+S["AMTAR"]="${SHELL} /home/more/Documents/workspace/sparrows/missing --run tar"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
 S["AWK"]="gawk"
@@ -563,12 +563,12 @@ S["mkdir_p"]="/bin/mkdir -p"
 S["MKDIR_P"]="/bin/mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]=""
-S["install_sh"]="$(SHELL) /home/more/Documents/workspace/smarthttpd-0.1/install-sh"
-S["MAKEINFO"]="${SHELL} /home/more/Documents/workspace/smarthttpd-0.1/missing --run makeinfo"
-S["AUTOHEADER"]="${SHELL} /home/more/Documents/workspace/smarthttpd-0.1/missing --run autoheader"
-S["AUTOMAKE"]="${SHELL} /home/more/Documents/workspace/smarthttpd-0.1/missing --run automake-1.10"
-S["AUTOCONF"]="${SHELL} /home/more/Documents/workspace/smarthttpd-0.1/missing --run autoconf"
-S["ACLOCAL"]="${SHELL} /home/more/Documents/workspace/smarthttpd-0.1/missing --run aclocal-1.10"
+S["install_sh"]="$(SHELL) /home/more/Documents/workspace/sparrows/install-sh"
+S["MAKEINFO"]="${SHELL} /home/more/Documents/workspace/sparrows/missing --run makeinfo"
+S["AUTOHEADER"]="${SHELL} /home/more/Documents/workspace/sparrows/missing --run autoheader"
+S["AUTOMAKE"]="${SHELL} /home/more/Documents/workspace/sparrows/missing --run automake-1.10"
+S["AUTOCONF"]="${SHELL} /home/more/Documents/workspace/sparrows/missing --run autoconf"
+S["ACLOCAL"]="${SHELL} /home/more/Documents/workspace/sparrows/missing --run aclocal-1.10"
 S["VERSION"]="0.1"
 S["PACKAGE"]="smarthttpd"
 S["CYGPATH_W"]="echo"
