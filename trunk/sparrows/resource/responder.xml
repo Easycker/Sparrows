@@ -3,14 +3,14 @@
 	<mods>
 		<mod_static path="mod_static.so">
 			<dir>
-				<dir loc="/"/>
+				<dir path="/"/>
 			</dir>
 			<type>
 				<type dot=".htm"/>
 				<type dot=".html"/>
 				<type dot=".jpg"/>
 				<type dot=".png"/>
-			</dot>
+			</type>
 		</mod_static>
 	</mods>
 </responder>

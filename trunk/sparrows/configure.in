@@ -5,7 +5,7 @@ AC_PREREQ(2.61)
 AC_INIT(smarthttpd, 0.1, monan@21cn.com)
 AC_CONFIG_SRCDIR([inc/])
 AM_CONFIG_HEADER(config.h)
-AM_INIT_AUTOMAKE(smarthttpd,0.1)
+AM_INIT_AUTOMAKE(sparrows,0.1)
 
 # Checks for programs.
 AC_PROG_CC

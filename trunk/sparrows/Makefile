@@ -16,9 +16,9 @@
 
 
 
-pkgdatadir = $(datadir)/smarthttpd
-pkglibdir = $(libdir)/smarthttpd
-pkgincludedir = $(includedir)/smarthttpd
+pkgdatadir = $(datadir)/sparrows
+pkglibdir = $(libdir)/sparrows
+pkgincludedir = $(includedir)/sparrows
 am__cd = CDPATH="$${ZSH_VERSION+.}$(PATH_SEPARATOR)" && cd
 install_sh_DATA = $(install_sh) -c -m 644
 install_sh_PROGRAM = $(install_sh) -c
@@ -31,7 +31,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-noinst_PROGRAMS = shttpd_io$(EXEEXT)
+noinst_PROGRAMS = shttpd_io$(EXEEXT) shttpd_responder$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -50,6 +50,10 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_shttpd_io_OBJECTS = io.$(OBJEXT) httpd_common.$(OBJEXT)
 shttpd_io_OBJECTS = $(am_shttpd_io_OBJECTS)
 shttpd_io_LDADD = $(LDADD)
+am_shttpd_responder_OBJECTS = responder.$(OBJEXT) \
+	httpd_common.$(OBJEXT)
+shttpd_responder_OBJECTS = $(am_shttpd_responder_OBJECTS)
+shttpd_responder_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -57,8 +61,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(shttpd_io_SOURCES)
-DIST_SOURCES = $(shttpd_io_SOURCES)
+SOURCES = $(shttpd_io_SOURCES) $(shttpd_responder_SOURCES)
+DIST_SOURCES = $(shttpd_io_SOURCES) $(shttpd_responder_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -100,12 +104,12 @@ INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LDFLAGS = 
 LIBOBJS = 
-LIBS = -lcda -lxmlo
+LIBS = -lcda -lxmlo -ldl
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} /home/more/Documents/workspace/sparrows/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
 OBJEXT = o
-PACKAGE = smarthttpd
+PACKAGE = sparrows
 PACKAGE_BUGREPORT = monan@21cn.com
 PACKAGE_NAME = smarthttpd
 PACKAGE_STRING = smarthttpd 0.1
@@ -159,6 +163,7 @@ top_build_prefix =
 top_builddir = .
 top_srcdir = .
 shttpd_io_SOURCES = src/io.c src/httpd_common.c
+shttpd_responder_SOURCES = src/responder.c src/httpd_common.c
 INCLUDES = -I$(CURRENTPATH)inc/
 noinst_HEADERS = inc/*.h
 all: config.h
@@ -222,6 +227,9 @@ clean-noinstPROGRAMS:
 shttpd_io$(EXEEXT): $(shttpd_io_OBJECTS) $(shttpd_io_DEPENDENCIES) 
 	@rm -f shttpd_io$(EXEEXT)
 	$(LINK) $(shttpd_io_OBJECTS) $(shttpd_io_LDADD) $(LIBS)
+shttpd_responder$(EXEEXT): $(shttpd_responder_OBJECTS) $(shttpd_responder_DEPENDENCIES) 
+	@rm -f shttpd_responder$(EXEEXT)
+	$(LINK) $(shttpd_responder_OBJECTS) $(shttpd_responder_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -231,6 +239,7 @@ distclean-compile:
 
 include ./$(DEPDIR)/httpd_common.Po
 include ./$(DEPDIR)/io.Po
+include ./$(DEPDIR)/responder.Po
 
 .c.o:
 	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -273,6 +282,20 @@ httpd_common.obj: src/httpd_common.c
 #	source='src/httpd_common.c' object='httpd_common.obj' libtool=no \
 #	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 #	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o httpd_common.obj `if test -f 'src/httpd_common.c'; then $(CYGPATH_W) 'src/httpd_common.c'; else $(CYGPATH_W) '$(srcdir)/src/httpd_common.c'; fi`
+
+responder.o: src/responder.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT responder.o -MD -MP -MF $(DEPDIR)/responder.Tpo -c -o responder.o `test -f 'src/responder.c' || echo '$(srcdir)/'`src/responder.c
+	mv -f $(DEPDIR)/responder.Tpo $(DEPDIR)/responder.Po
+#	source='src/responder.c' object='responder.o' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o responder.o `test -f 'src/responder.c' || echo '$(srcdir)/'`src/responder.c
+
+responder.obj: src/responder.c
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT responder.obj -MD -MP -MF $(DEPDIR)/responder.Tpo -c -o responder.obj `if test -f 'src/responder.c'; then $(CYGPATH_W) 'src/responder.c'; else $(CYGPATH_W) '$(srcdir)/src/responder.c'; fi`
+	mv -f $(DEPDIR)/responder.Tpo $(DEPDIR)/responder.Po
+#	source='src/responder.c' object='responder.obj' libtool=no \
+#	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+#	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o responder.obj `if test -f 'src/responder.c'; then $(CYGPATH_W) 'src/responder.c'; else $(CYGPATH_W) '$(srcdir)/src/responder.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

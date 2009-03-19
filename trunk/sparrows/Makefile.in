@@ -31,7 +31,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-noinst_PROGRAMS = shttpd_io$(EXEEXT)
+noinst_PROGRAMS = shttpd_io$(EXEEXT) shttpd_responder$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -50,6 +50,10 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_shttpd_io_OBJECTS = io.$(OBJEXT) httpd_common.$(OBJEXT)
 shttpd_io_OBJECTS = $(am_shttpd_io_OBJECTS)
 shttpd_io_LDADD = $(LDADD)
+am_shttpd_responder_OBJECTS = responder.$(OBJEXT) \
+	httpd_common.$(OBJEXT)
+shttpd_responder_OBJECTS = $(am_shttpd_responder_OBJECTS)
+shttpd_responder_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -57,8 +61,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(shttpd_io_SOURCES)
-DIST_SOURCES = $(shttpd_io_SOURCES)
+SOURCES = $(shttpd_io_SOURCES) $(shttpd_responder_SOURCES)
+DIST_SOURCES = $(shttpd_io_SOURCES) $(shttpd_responder_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -100,7 +104,7 @@ INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LDFLAGS = @LDFLAGS@
 LIBOBJS = @LIBOBJS@
-LIBS = -lcda -lxmlo
+LIBS = -lcda -lxmlo -ldl
 LTLIBOBJS = @LTLIBOBJS@
 MAKEINFO = @MAKEINFO@
 MKDIR_P = @MKDIR_P@
@@ -159,6 +163,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 shttpd_io_SOURCES = src/io.c src/httpd_common.c
+shttpd_responder_SOURCES = src/responder.c src/httpd_common.c
 INCLUDES = -I$(CURRENTPATH)inc/
 noinst_HEADERS = inc/*.h
 all: config.h
@@ -222,6 +227,9 @@ clean-noinstPROGRAMS:
 shttpd_io$(EXEEXT): $(shttpd_io_OBJECTS) $(shttpd_io_DEPENDENCIES) 
 	@rm -f shttpd_io$(EXEEXT)
 	$(LINK) $(shttpd_io_OBJECTS) $(shttpd_io_LDADD) $(LIBS)
+shttpd_responder$(EXEEXT): $(shttpd_responder_OBJECTS) $(shttpd_responder_DEPENDENCIES) 
+	@rm -f shttpd_responder$(EXEEXT)
+	$(LINK) $(shttpd_responder_OBJECTS) $(shttpd_responder_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -231,6 +239,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/httpd_common.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/io.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/responder.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -273,6 +282,20 @@ httpd_common.obj: src/httpd_common.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/httpd_common.c' object='httpd_common.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o httpd_common.obj `if test -f 'src/httpd_common.c'; then $(CYGPATH_W) 'src/httpd_common.c'; else $(CYGPATH_W) '$(srcdir)/src/httpd_common.c'; fi`
+
+responder.o: src/responder.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT responder.o -MD -MP -MF $(DEPDIR)/responder.Tpo -c -o responder.o `test -f 'src/responder.c' || echo '$(srcdir)/'`src/responder.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/responder.Tpo $(DEPDIR)/responder.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/responder.c' object='responder.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o responder.o `test -f 'src/responder.c' || echo '$(srcdir)/'`src/responder.c
+
+responder.obj: src/responder.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT responder.obj -MD -MP -MF $(DEPDIR)/responder.Tpo -c -o responder.obj `if test -f 'src/responder.c'; then $(CYGPATH_W) 'src/responder.c'; else $(CYGPATH_W) '$(srcdir)/src/responder.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/responder.Tpo $(DEPDIR)/responder.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='src/responder.c' object='responder.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o responder.obj `if test -f 'src/responder.c'; then $(CYGPATH_W) 'src/responder.c'; else $(CYGPATH_W) '$(srcdir)/src/responder.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

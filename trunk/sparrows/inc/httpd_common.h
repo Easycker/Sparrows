@@ -27,6 +27,4 @@ HTTP_REQUEST* request_Analysis(HTTP_REQUEST *request,C_ARRAY CHAR_* const string
 
 BOOL_ request_Send(HTTP_REQUEST *request,int fd);
 
-unsigned char elf_Tinyhash(C_STRING const string);
-
 #endif
