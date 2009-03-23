@@ -7,11 +7,10 @@
 #include <xmlo/xmlo.h>
 #include <dlfcn.h>
 #include <stdint.h>
+#include <unistd.h>
 #include "httpd_common.h"
 
 #define HASH_KEY_ ENCODE_("%S%S")
-
-#define HOWTO_ ENCODE_("howto?\n")
 
 typedef struct mod_t
 {
@@ -32,14 +31,17 @@ typedef struct hash_mod
 typedef struct responder_config
 {
 	UINT_ port;
-	C_ARRAY MOD_T *mods;
 	C_HASH mod_table;
 }RESPONDER_CONFIG;
 
-unsigned char elf_Tinyhash(MOD_T *mod);
+UINT_ elf_Tinyhash(MOD_T *mod);
 
 RESPONDER_CONFIG* responder_Config(RESPONDER_CONFIG *config,FILE *fp);
 
-int main(int argc,char *argv[]);
+void config_Drop(RESPONDER_CONFIG *config);
+
+BOOL_ mod_Exec(RESPONDER_CONFIG *config,HTTP_REQUEST *request,int fd);
+
+/*int main(int argc,char *argv[]);*/
 
 #endif

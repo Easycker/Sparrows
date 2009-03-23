@@ -12,6 +12,7 @@
 #include <sys/types.h>
 #include <errno.h>
 #include "httpd_common.h"
+#include "responder.h"
 
 #define HOWTO_ ENCODE_("example:./server <filename>\n")
 
@@ -39,7 +40,7 @@ BOOL_ lock_Get(LOCK_T *lock);
 
 void lock_Free(LOCK_T *lock);
 
-void child_Main(IO_CONFIG *config,int listenfd,LOCK_T *child_lock);
+void child_Main(IO_CONFIG *config,RESPONDER_CONFIG *res_config,int listenfd,LOCK_T *child_lock);
 
 int main(int argc,char *argv[]);
 

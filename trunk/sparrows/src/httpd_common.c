@@ -10,25 +10,25 @@ C_STRING httpd_Nrecv(C_STRING *data,int fd,int buf_len,size_t n)
 	char end_char;
 
 	data_ansi=array_Create(sizeof(char));
-	data_ansi=array_Resize(data_ansi,buf_len);
+	array_Resize(&data_ansi,buf_len);
 	request_len=0;
 	do
 	{
 		recv_len=read(fd,((char*)data_ansi)+request_len,buf_len);
 		request_len+=recv_len;
 		array_Head(data_ansi)->array_length+=recv_len;
-		data_ansi=array_Resize(data_ansi,array_Length(data_ansi)+request_len+1);
+		array_Resize(&data_ansi,array_Length(data_ansi)+request_len+1);
 	}while((int)recv_len>=(int)(buf_len));
 	end_char='\0';
-	data_ansi=array_Append(data_ansi,&end_char);
+	array_Append(&data_ansi,&end_char);
 
-	*data=array_Resize(*data,0);
+	array_Resize(data,0);
 	if(string_Ansitowide(data,data_ansi)==NULL)goto fail_return;
-	array_Drop(data_ansi);
+	array_Drop(&data_ansi);
 	return *data;
 
 	fail_return:
-	array_Drop(data_ansi);
+	array_Drop(&data_ansi);
 	return NULL;
 
 };
@@ -54,12 +54,12 @@ HTTP_REQUEST* request_Analysis(HTTP_REQUEST *request,C_ARRAY CHAR_* const string
 	else if(*op==ENCODE_('P'))request->type=POST;
 	else goto fail_return;
 	while(*op!=ENCODE_(' '))++op;
-	request->path=array_Resize(request->path,0);
-	for(++op;*op!=ENCODE_('?')&&*op!=ENCODE_(' ');++op)request->path=array_Append(request->path,op);
-	request->path=array_Append(request->path,&end_char);
-	request->get=array_Resize(request->get,0);
-	if(*op==ENCODE_('?'))for(;*op!=ENCODE_(' ');++op)request->get=array_Append(request->get,op);
-	request->get=array_Append(request->get,&end_char);
+	array_Resize(&request->path,0);
+	for(++op;*op!=ENCODE_('?')&&*op!=ENCODE_(' ');++op)array_Append(&request->path,op);
+	array_Append(&request->path,&end_char);
+	array_Resize(&request->get,0);
+	if(*op==ENCODE_('?'))for(;*op!=ENCODE_(' ');++op)array_Append(&request->get,op);
+	array_Append(&request->get,&end_char);
 	return request;
 
 	fail_return:

@@ -4,7 +4,9 @@
 #include <cda/c_string.h>
 #include <cda/c_define.h>
 #include <stdint.h>
+#include "shttpd_type.h"
 
+/*
 typedef enum request_type
 {
 	GET=0,
@@ -18,6 +20,7 @@ typedef struct http_request
 	C_STRING get;
 	C_STRING post;
 }HTTP_REQUEST;
+*/
 
 C_STRING httpd_Nrecv(C_STRING *data,int fd,int buf_len,size_t n);
 

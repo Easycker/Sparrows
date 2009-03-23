@@ -22,7 +22,7 @@ IO_CONFIG* io_Config(IO_CONFIG *config,FILE *fp)
 	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("resv_buf"),config_root),&doc);
 	config->resv_buf=STRTOL_(cache,NULL,0);
 	
-	string_Drop(cache);
+	string_Drop(&cache);
 	xml_Close(&doc);
 };
 
@@ -51,7 +51,7 @@ void lock_Free(LOCK_T *lock)
 	unlink(lock->file);
 };
 
-void child_Main(IO_CONFIG *config,int listenfd,LOCK_T *child_lock)
+void child_Main(IO_CONFIG *config,RESPONDER_CONFIG *res_config,int listenfd,LOCK_T *child_lock)
 {
 	int fp;
 	socklen_t len;
@@ -91,8 +91,9 @@ void child_Main(IO_CONFIG *config,int listenfd,LOCK_T *child_lock)
 				request_Create(&request);
 				if(request_Analysis(&request,buf)==NULL)PRINTF_(ENCODE_("FAILED\n"));
 				PRINTF_(ENCODE_("type:%d,path:%S\n"),request.type,request.path);
-				send(client_fd,"Hello!\n",8,0);
-				string_Drop(buf);
+				mod_Exec(res_config,&request,client_fd);
+				/*send(client_fd,"Hello!\n",8,0);*/
+				string_Drop(&buf);
 				close(client_fd);
 			};
 		};
@@ -103,7 +104,8 @@ int main(int argc,char *argv[])
 {
 	/*this is a process-base mpm*/
 	FILE *fp;
-	IO_CONFIG config;
+	IO_CONFIG io_config;
+	RESPONDER_CONFIG responder_config;
 	UINT_ i;
 	pid_t pid;
 	LOCK_T lock;
@@ -114,7 +116,10 @@ int main(int argc,char *argv[])
 	if(argc>1&&argc<3)
 	{
 	fp=fopen(argv[1],"r");
-	io_Config(&config,fp);
+	responder_Config(&responder_config,fp);
+	fclose(fp);
+	fp=fopen(argv[1],"r");
+	io_Config(&io_config,fp);
 	fclose(fp);
 	}
 	else
@@ -126,19 +131,19 @@ int main(int argc,char *argv[])
 	/*create a socket*/
 	if((listenfd=socket(AF_INET,SOCK_STREAM,0))==-1)goto fail_return;
 	server.sin_family=AF_INET;
-	server.sin_port=htons(config.http_port);
+	server.sin_port=htons(io_config.http_port);
 	server.sin_addr.s_addr=htonl(INADDR_ANY);
 	if((bind(listenfd,(struct sockaddr*)&server,sizeof(server)))==-1)goto fail_return;
-	if(listen(listenfd,config.stable_process)==-1)goto fail_return;
+	if(listen(listenfd,io_config.stable_process)==-1)goto fail_return;
 
 	/*now fork the childs*/
-	lock_Init(&lock,config.lock_file);
-	for(i=0;i<config.stable_process;++i)
+	lock_Init(&lock,io_config.lock_file);
+	for(i=0;i<io_config.stable_process;++i)
 	{
 		pid=fork();
 		if(pid==0)
 		{
-			child_Main(&config,listenfd,&lock);
+			child_Main(&io_config,&responder_config,listenfd,&lock);
 			break;
 		};
 	};

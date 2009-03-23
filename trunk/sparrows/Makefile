@@ -31,7 +31,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-noinst_PROGRAMS = shttpd_io$(EXEEXT) shttpd_responder$(EXEEXT)
+noinst_PROGRAMS = shttpd$(EXEEXT)
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(noinst_HEADERS) \
 	$(srcdir)/Makefile.am $(srcdir)/Makefile.in \
@@ -47,13 +47,10 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_shttpd_io_OBJECTS = io.$(OBJEXT) httpd_common.$(OBJEXT)
-shttpd_io_OBJECTS = $(am_shttpd_io_OBJECTS)
-shttpd_io_LDADD = $(LDADD)
-am_shttpd_responder_OBJECTS = responder.$(OBJEXT) \
-	httpd_common.$(OBJEXT)
-shttpd_responder_OBJECTS = $(am_shttpd_responder_OBJECTS)
-shttpd_responder_LDADD = $(LDADD)
+am_shttpd_OBJECTS = io.$(OBJEXT) httpd_common.$(OBJEXT) \
+	responder.$(OBJEXT)
+shttpd_OBJECTS = $(am_shttpd_OBJECTS)
+shttpd_LDADD = $(LDADD)
 DEFAULT_INCLUDES = -I.
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -61,8 +58,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(shttpd_io_SOURCES) $(shttpd_responder_SOURCES)
-DIST_SOURCES = $(shttpd_io_SOURCES) $(shttpd_responder_SOURCES)
+SOURCES = $(shttpd_SOURCES)
+DIST_SOURCES = $(shttpd_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -162,8 +159,7 @@ target_alias =
 top_build_prefix = 
 top_builddir = .
 top_srcdir = .
-shttpd_io_SOURCES = src/io.c src/httpd_common.c
-shttpd_responder_SOURCES = src/responder.c src/httpd_common.c
+shttpd_SOURCES = src/io.c src/httpd_common.c src/responder.c
 INCLUDES = -I$(CURRENTPATH)inc/
 noinst_HEADERS = inc/*.h
 all: config.h
@@ -224,12 +220,9 @@ distclean-hdr:
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-shttpd_io$(EXEEXT): $(shttpd_io_OBJECTS) $(shttpd_io_DEPENDENCIES) 
-	@rm -f shttpd_io$(EXEEXT)
-	$(LINK) $(shttpd_io_OBJECTS) $(shttpd_io_LDADD) $(LIBS)
-shttpd_responder$(EXEEXT): $(shttpd_responder_OBJECTS) $(shttpd_responder_DEPENDENCIES) 
-	@rm -f shttpd_responder$(EXEEXT)
-	$(LINK) $(shttpd_responder_OBJECTS) $(shttpd_responder_LDADD) $(LIBS)
+shttpd$(EXEEXT): $(shttpd_OBJECTS) $(shttpd_DEPENDENCIES) 
+	@rm -f shttpd$(EXEEXT)
+	$(LINK) $(shttpd_OBJECTS) $(shttpd_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
