@@ -122,8 +122,9 @@ BOOL_ mod_Exec(RESPONDER_CONFIG *config,HTTP_REQUEST *request,int fd)
 	mod=hash_Get(&config->mod_table,&search);
 	if(mod!=NULL)
 	{
-		PRINTF_(ENCODE_("NOW I WILL CALL THE MOD\n"));
-		PRINTF_(ENCODE_("CALLING!\n"));
+		/*response 200 ok*/
+		send(fd,HTTP_OK_,sizeof(HTTP_OK_),0);
+		/*call the mod*/
 		mod->mod_Main(request,fd);
 	};
 	return TRUE_;

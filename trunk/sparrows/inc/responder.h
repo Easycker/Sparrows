@@ -12,6 +12,8 @@
 
 #define HASH_KEY_ ENCODE_("%S%S")
 
+#define HTTP_OK_ "HTTP/1.1 200 OK\r\n"
+
 typedef struct mod_t
 {
 	C_STRING key;

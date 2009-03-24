@@ -30,7 +30,6 @@ C_STRING httpd_Nrecv(C_STRING *data,int fd,int buf_len,size_t n)
 	fail_return:
 	array_Drop(&data_ansi);
 	return NULL;
-
 };
 
 HTTP_REQUEST* request_Create(HTTP_REQUEST *request)
