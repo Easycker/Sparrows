@@ -1,9 +1,0 @@
-<io>
-	<max_process>3000</max_process>
-	<stable_process>10</stable_process>
-	<http_port>8802</http_port>
-	<cache_adr>localhost</cache_adr>
-	<cache_port>8803</cache_port>
-	<resv_buf>512</resv_buf>
-	<lock_file>/tmp/io_lock</lock_file>
-</io>
