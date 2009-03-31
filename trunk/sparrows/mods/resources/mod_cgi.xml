@@ -1,0 +1,10 @@
+<mod_cgi>
+	<type>
+		<type dot=".sh" exec="bash %S"/>
+		<type dot=".py" exec="python %S"/>
+		<type dot=".class" exec="java %S"/>
+	</type>
+	<default_exec>"bash"</default_exec>
+	<root_dir>"/home/more"</root_dir>
+	<index_page>"index.cgi"</index_page>
+</mod_cgi>
