@@ -1,0 +1,4 @@
+<mod_cgi>
+	<root_dir>"/home/more/Documents/workspace/www"</root_dir>
+	<index_page>"index.cgi"</index_page>
+</mod_cgi>

@@ -1,0 +1,19 @@
+<mod_static>
+	<mime>
+		<mime dot=".txt" type="text/plain"/>
+		<mime dot=".css" type="text/css"/>
+		<mime dot=".js" type="text/javascript"/>
+		<mime dot=".htm" type="text/html"/>
+		<mime dot=".html" type="text/html"/>
+		<mime dot=".gif" type="image/gif"/>
+		<mime dot=".jpeg" type="image/jpeg"/>
+		<mime dot=".jpg" type="image/jpeg"/>
+		<mime dot=".png" type="image/png"/>
+		<mime dot=".gz" type="application/gzip"/>
+	</mime>
+	<default_mime>
+		<mime type="application/octet-stream"/>
+	</default_mime>
+	<root_dir>"/home/more/Documents/workspace/www"</root_dir>
+	<index_page>"index.html"</index_page>
+</mod_static>
