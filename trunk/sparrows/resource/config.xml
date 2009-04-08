@@ -1,0 +1,52 @@
+<!This is a xml like config/>
+<!这是sparrows的基本配置文件，采用类xml语法编写/>
+
+<!responder部分管理模块的分配与加载/>
+<responder>
+	<mods>
+		<!mods块表明以下为模块加载配置，每个模块的具体配置请参见其配置文件/>
+		<mod_static path="mods/mod_static.so" config="mods/resources/mod_static.xml">
+		<!静态页面模块，文件名为mod_static.so，其配置为mod_static.xml/>
+			<dir>
+			<!将在以下目录使用该模块/>
+				<dir path="/"/>
+				<dir path="/button/"/>
+			</dir>
+			<type>
+				<!将对以上目录中的以下扩展名文件使用该模块处理/>
+				<type dot=".htm"/>
+				<type dot=".html"/>
+				<type dot=".jpg"/>
+				<type dot=".png"/>
+				<type dot=".css"/>
+				<type dot=".gif"/>
+				<type dot=".js"/>
+				<type dot=""/>
+			</type>
+		</mod_static>
+		<mod_cgi path="mods/mod_cgi.so" config="mods/resources/mod_cgi.xml">
+			<!cgi响应模块/>
+			<dir>
+				<dir path="/cgi-bin/"/>
+			</dir>
+			<type>
+				<type dot=".cgi"/>
+				<type dot=".sh"/>
+				<type dot=".php"/>
+			</type>
+		</mod_cgi>
+	</mods>
+</responder>
+<!IO部分管理核心的请求处理方式/>
+<io_process>
+	<max_process>30</max_process>
+	<!最大进程数/>
+	<stable_process>1</stable_process>
+	<!稳定进程数，应小于最大进程数/>
+	<http_port>8805</http_port>
+	<!监听HTTP端口，80端口需以root权限运行服务/>
+	<io_buf>4096</io_buf>
+	<!收发缓冲区，加大该值可以改善性能，但会增加内存占用/>
+	<lock_file>/tmp/io_lock</lock_file>
+	<!锁定文件，用于进程间互斥操作，需写权限/>
+</io_process>
