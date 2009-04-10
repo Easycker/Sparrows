@@ -1,0 +1,7 @@
+<mod_cgi>
+<!cgi模块配置/>
+	<root_dir>"/home/more/Documents/workspace/www"</root_dir>
+	<!cgi根目录/>
+	<index_page>"index.cgi"</index_page>
+	<!默认cgi程序/>
+</mod_cgi>
