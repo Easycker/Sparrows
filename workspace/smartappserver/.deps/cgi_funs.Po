@@ -1,0 +1,145 @@
+cgi_funs.o: src/cgi_funs.c inc/cgi_funs.h /usr/include/fcgi_stdio.h \
+  /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h \
+  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+  /usr/include/gnu/stubs-64.h \
+  /usr/lib/gcc/x86_64-unknown-linux-gnu/4.3.3/include/stddef.h \
+  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
+  /usr/include/libio.h /usr/include/_G_config.h /usr/include/wchar.h \
+  /usr/lib/gcc/x86_64-unknown-linux-gnu/4.3.3/include/stdarg.h \
+  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+  /usr/include/bits/stdio.h /usr/include/sys/types.h /usr/include/time.h \
+  /usr/include/endian.h /usr/include/bits/endian.h \
+  /usr/include/bits/byteswap.h /usr/include/sys/select.h \
+  /usr/include/bits/select.h /usr/include/bits/sigset.h \
+  /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
+  /usr/include/bits/pthreadtypes.h /usr/include/fcgiapp.h \
+  /usr/include/stdlib.h /usr/include/alloca.h /usr/include/ctype.h \
+  /usr/local/include/cda/c_prtree.h /usr/local/include/cda/c_define.h \
+  /usr/local/include/cda/c_mem.h /usr/include/malloc.h \
+  /usr/local/include/cda/c_stack.h /usr/local/include/cda/c_array.h \
+  /usr/include/string.h /usr/include/bits/string.h \
+  /usr/include/bits/string2.h /usr/local/include/cda/c_define.h \
+  /usr/local/include/dbo/dbo_mysql.h /usr/local/include/cda/c_string.h \
+  /usr/include/bits/wchar.h /usr/include/locale.h \
+  /usr/include/bits/locale.h /usr/include/mysql/mysql.h \
+  /usr/include/mysql/mysql_version.h /usr/include/mysql/mysql_com.h \
+  /usr/include/mysql/mysql_time.h /usr/include/mysql/typelib.h \
+  /usr/include/mysql/my_alloc.h /usr/include/mysql/my_list.h \
+  /usr/local/include/dbo/dbo_base.h /usr/local/include/cda/c_array.h \
+  /usr/local/include/cda/c_stack.h
+
+inc/cgi_funs.h:
+
+/usr/include/fcgi_stdio.h:
+
+/usr/include/stdio.h:
+
+/usr/include/features.h:
+
+/usr/include/sys/cdefs.h:
+
+/usr/include/bits/wordsize.h:
+
+/usr/include/gnu/stubs.h:
+
+/usr/include/gnu/stubs-64.h:
+
+/usr/lib/gcc/x86_64-unknown-linux-gnu/4.3.3/include/stddef.h:
+
+/usr/include/bits/types.h:
+
+/usr/include/bits/typesizes.h:
+
+/usr/include/libio.h:
+
+/usr/include/_G_config.h:
+
+/usr/include/wchar.h:
+
+/usr/lib/gcc/x86_64-unknown-linux-gnu/4.3.3/include/stdarg.h:
+
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/sys/types.h:
+
+/usr/include/time.h:
+
+/usr/include/endian.h:
+
+/usr/include/bits/endian.h:
+
+/usr/include/bits/byteswap.h:
+
+/usr/include/sys/select.h:
+
+/usr/include/bits/select.h:
+
+/usr/include/bits/sigset.h:
+
+/usr/include/bits/time.h:
+
+/usr/include/sys/sysmacros.h:
+
+/usr/include/bits/pthreadtypes.h:
+
+/usr/include/fcgiapp.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/alloca.h:
+
+/usr/include/ctype.h:
+
+/usr/local/include/cda/c_prtree.h:
+
+/usr/local/include/cda/c_define.h:
+
+/usr/local/include/cda/c_mem.h:
+
+/usr/include/malloc.h:
+
+/usr/local/include/cda/c_stack.h:
+
+/usr/local/include/cda/c_array.h:
+
+/usr/include/string.h:
+
+/usr/include/bits/string.h:
+
+/usr/include/bits/string2.h:
+
+/usr/local/include/cda/c_define.h:
+
+/usr/local/include/dbo/dbo_mysql.h:
+
+/usr/local/include/cda/c_string.h:
+
+/usr/include/bits/wchar.h:
+
+/usr/include/locale.h:
+
+/usr/include/bits/locale.h:
+
+/usr/include/mysql/mysql.h:
+
+/usr/include/mysql/mysql_version.h:
+
+/usr/include/mysql/mysql_com.h:
+
+/usr/include/mysql/mysql_time.h:
+
+/usr/include/mysql/typelib.h:
+
+/usr/include/mysql/my_alloc.h:
+
+/usr/include/mysql/my_list.h:
+
+/usr/local/include/dbo/dbo_base.h:
+
+/usr/local/include/cda/c_array.h:
+
+/usr/local/include/cda/c_stack.h:

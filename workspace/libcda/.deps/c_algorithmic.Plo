@@ -1,0 +1,3 @@
+c_algorithmic.lo: src/c_algorithmic.c inc/c_algorithmic.h
+
+inc/c_algorithmic.h:
