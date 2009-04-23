@@ -1,0 +1,201 @@
+DLERROR:(null)
+READ BASIC CONFIG DONE
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+ADDED ONE MIME
+mod_static loaded
+the root is /home/more/Documents/workspace/www,and the mimes:
+the mime0's dot is:.txt,type is text/plain
+the mime1's dot is:.css,type is text/css
+the mime2's dot is:.js,type is text/javascript
+the mime3's dot is:.htm,type is text/html
+the mime4's dot is:.html,type is text/html
+the mime5's dot is:.gif,type is image/gif
+the mime6's dot is:.jpeg,type is image/jpeg
+the mime7's dot is:.jpg,type is image/jpeg
+the mime8's dot is:.png,type is image/png
+the mime9's dot is:.gz,type is application/gzip
+NOW CREATE AN EPOLL_FD THE LENGTH IS:512
+THE FD HAD BEEN CREATE,IT'S:4
+THE EPOLL_FD IS 4,FD IS 3
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 5
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:5
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+OK,THE Accept:  IS text/html, text/*;q=0.5, image/*
+OK,THE Accept-Encoding:  IS gzip, compress, bzip, bzip2, deflate
+OK,THE Accept-Language:  IS en;q=1.0
+OK,THE User-Agent:  IS w3m/0.5.2
+THE PATH IS /,ROOT_DIR IS
+FILE OPEN OK!
+CHECKING MIME DONE,THE TYPE IS text/html
+CONNECT WILL CHANGE TO OUTPUT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:5
+OK START TO WORK
+KEEP THE CONNECT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:5
+OK START TO WORK
+EVENT WILL DOWN
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 5
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:5
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+KEEP ALIVE:0
+OK,THE Accept:  IS text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+OK,THE Accept-Charset:  IS gb2312,utf-8;q=0.7,*;q=0.7
+OK,THE Accept-Encoding:  IS gzip,deflate
+OK,THE Accept-Language:  IS zh-cn,zh;q=0.5
+OK,THE User-Agent:  IS Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.8) Gecko/2009033008 GranParadiso/3.0.8
+THE PATH IS /,ROOT_DIR IS
+FILE OPEN OK!
+CHECKING MIME DONE,THE TYPE IS text/html
+CONNECT WILL CHANGE TO OUTPUT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:5
+OK START TO WORK
+EVENT WILL DOWN
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 5
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:5
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+KEEP ALIVE:0
+OK,THE Accept:  IS image/png,image/*;q=0.8,*/*;q=0.5
+OK,THE Accept-Charset:  IS gb2312,utf-8;q=0.7,*;q=0.7
+OK,THE Accept-Encoding:  IS gzip,deflate
+OK,THE Accept-Language:  IS zh-cn,zh;q=0.5
+OK,THE User-Agent:  IS Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.8) Gecko/2009033008 GranParadiso/3.0.8
+THE PATH IS /,ROOT_DIR IS
+FILE NOT FOUND
+EVENT WILL DOWN
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 6
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+KEEP ALIVE:0
+OK,THE Accept:  IS text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+OK,THE Accept-Charset:  IS gb2312,utf-8;q=0.7,*;q=0.7
+OK,THE Accept-Encoding:  IS gzip,deflate
+OK,THE Accept-Language:  IS zh-cn,zh;q=0.5
+OK,THE User-Agent:  IS Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.8) Gecko/2009033008 GranParadiso/3.0.8
+THE PATH IS /,ROOT_DIR IS
+FILE OPEN OK!
+CHECKING MIME DONE,THE TYPE IS text/html
+CONNECT WILL CHANGE TO OUTPUT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+KEEP THE CONNECT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+EVENT WILL DOWN
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 6
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+OK,THE Accept:  IS text/html, text/*;q=0.5, image/*
+OK,THE Accept-Encoding:  IS gzip, compress, bzip, bzip2, deflate
+OK,THE Accept-Language:  IS en;q=1.0
+OK,THE User-Agent:  IS w3m/0.5.2
+THE PATH IS /,ROOT_DIR IS
+FILE OPEN OK!
+CHECKING MIME DONE,THE TYPE IS text/html
+CONNECT WILL CHANGE TO OUTPUT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+EVENT WILL DOWN
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 6
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+KEEP ALIVE:0
+OK,THE Accept:  IS text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+OK,THE Accept-Charset:  IS gb2312,utf-8;q=0.7,*;q=0.7
+OK,THE Accept-Encoding:  IS gzip,deflate
+OK,THE Accept-Language:  IS zh-cn,zh;q=0.5
+OK,THE User-Agent:  IS Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.8) Gecko/2009033008 GranParadiso/3.0.8
+THE PATH IS /,ROOT_DIR IS
+FILE OPEN OK!
+CHECKING MIME DONE,THE TYPE IS text/html
+CONNECT WILL CHANGE TO OUTPUT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+EVENT WILL DOWN
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 6
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:6
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+KEEP ALIVE:0
+OK,THE Accept:  IS text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+OK,THE Accept-Charset:  IS gb2312,utf-8;q=0.7,*;q=0.7
+OK,THE Accept-Encoding:  IS gzip,deflate
+OK,THE Accept-Language:  IS zh-cn,zh;q=0.5
+OK,THE User-Agent:  IS Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.8) Gecko/2009033008 GranParadiso/3.0.8
+THE PATH IS /,ROOT_DIR IS
+FILE NOT FOUND
+EVENT WILL DOWN
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:3
+NEED A NEW PORT?
+THE EPOLL_FD IS 4,FD IS 7
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:7
+OK START TO WORK
+OK,THE HOST IS localhost:8805
+KEEP ALIVE:0
+OK,THE Accept:  IS text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+OK,THE Accept-Charset:  IS gb2312,utf-8;q=0.7,*;q=0.7
+OK,THE Accept-Encoding:  IS gzip,deflate
+OK,THE Accept-Language:  IS zh-cn,zh;q=0.5
+OK,THE User-Agent:  IS Mozilla/5.0 (X11; U; Linux x86_64; en-US; rv:1.9.0.8) Gecko/2009033008 GranParadiso/3.0.8
+THE PATH IS /,ROOT_DIR IS
+FILE OPEN OK!
+CHECKING MIME DONE,THE TYPE IS text/html
+CONNECT WILL CHANGE TO OUTPUT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:7
+OK START TO WORK
+KEEP THE CONNECT
+GET AN EPOLL EVENT
+FOUND THE EVENT IN LIST,IT'S FD IS:7
+OK START TO WORK
+EVENT WILL DOWN
