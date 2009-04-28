@@ -1,0 +1,16 @@
+<!这是sparrows的基本配置文件，采用类xml语法编写/>
+
+<!responder部分管理模块的分配与加载/>
+<modmanage>
+	<mods>
+		<mod path="mods/mod_static.so" arg="mods/resources/mod_static.xml"/>
+	</mods>
+</modmanage>
+<io_epoll>
+	<http_port>8805</http_port>
+	<!http监听端口/>
+	<poll_length>512</pool_length>
+	<!连接池长度,高并发下请加大此值/>
+	<io_buf>8192</io_buf>
+	<!http头缓冲区长度,不宜过大/>
+</io_epool>

@@ -1,0 +1,30 @@
+<mod_static>
+	<dirs>
+		<dir regex="/" root="www"/>
+		<dir regex="/home/" root="home"/>
+	</dirs>
+	<regex>"/"</regex>
+	<mime>
+		<mime dot=".txt" type="text/plain"/>
+		<mime dot=".css" type="text/css"/>
+		<mime dot=".js" type="text/javascript"/>
+		<mime dot=".htm" type="text/html"/>
+		<mime dot=".html" type="text/html"/>
+		<mime dot=".gif" type="image/gif"/>
+		<mime dot=".jpeg" type="image/jpeg"/>
+		<mime dot=".jpg" type="image/jpeg"/>
+		<mime dot=".png" type="image/png"/>
+		<mime dot=".tar.gz" type="application/gzip"/>
+		<mime dot=".iso" type="application/octet-stream"/>
+	</mime>
+	<default_mime>
+	<!默认mime头/>
+		<mime type="application/octet-stream"/>
+	</default_mime>
+	<root_dir>"www"</root_dir>
+	<!根目录/>
+	<index_page>"index.html"</index_page>
+	<!主页/>
+	<buf_size>32768</buf_size>
+	<!缓存大小,不小于4096/>
+</mod_static>
