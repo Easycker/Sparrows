@@ -1,0 +1,1 @@
+gcc -o mod_static.so src/mod_static.c -I inc/ -fPIC -shared -Wall -ansi -lcda -lxmlo -g -std=c99
