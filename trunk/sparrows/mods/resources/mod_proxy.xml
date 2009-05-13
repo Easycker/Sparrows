@@ -1,0 +1,7 @@
+<mod_proxy>
+	<proxy>
+		<google regex="google" addr="72.14.253.160" port="80"/>
+		<baidu regex="baidu" addr="220.181.6.173" port="80"/>
+	</proxy>
+	<buf_size>32768</buf_size>
+</mod_proxy>
