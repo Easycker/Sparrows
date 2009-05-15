@@ -1,6 +1,6 @@
 <config>
 	<http_interface>0</http_interface>
-	<http_port>8805</http_port>
+	<http_port>8806</http_port>
 	<io_buf>8192</io_buf>
 	<poll_length>8192</pool_length>
 	<hosts>

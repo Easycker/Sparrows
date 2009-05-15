@@ -294,5 +294,6 @@ int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect)
 		};
 	};
 fail_return:
+	array_Drop(&cache_ansi);
 	return WORK_CLOSE_;
 };

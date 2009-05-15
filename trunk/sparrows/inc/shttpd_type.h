@@ -1,11 +1,17 @@
 #ifndef SHTTPD_TYPE_H
 #define SHTTPD_TYPE_H
 
-#define DEBUG_
+/*#define DEBUG_*/
+#define DEBUG2_
 #ifdef DEBUG_
 #define ERROR_OUT_ FPRINTF_
 #else
 #define ERROR_OUT_
+#endif
+#ifdef DEBUG2_
+#define ERROR_OUT2_ FPRINTF_
+#else
+#define ERROR_OUT2
 #endif
 
 #define HASH_SPACE_ 0x0000ffff

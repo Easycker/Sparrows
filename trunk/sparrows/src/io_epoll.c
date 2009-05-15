@@ -235,8 +235,22 @@ int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
 						client_fd=accept(current_connect->fd,(struct sockaddr*)&client,&len);
 						if(client_fd<0)
 						{
-							ERROR_OUT_(stderr,ENCODE_("ERROR ON ACCEPT\n"));
-							break;
+							ERROR_OUT2_(stderr,ENCODE_("ERROR ON ACCEPT\n"));
+							if(errno==EAGAIN||errno==EWOULDBLOCK)ERROR_OUT2_(stderr,ENCODE_("ACCEPT BLOCKING\n"));
+							if(errno==EFAULT)ERROR_OUT2_(stderr,ENCODE_("CONNECTION HAD BEEN ABORT\n"));
+							if(errno==EMFILE)
+							{
+								ERROR_OUT2_(stderr,ENCODE_("FILE LIMIT REACHED\n"));
+								exit(1);
+							};
+							if(errno==ENFILE)
+							{
+								ERROR_OUT2_(stderr,ENCODE_("SYSTEM LIMIT REACHED\n"));
+								exit(1);
+							};
+							if(errno==ETIMEDOUT)ERROR_OUT2_(stderr,ENCODE_("ACCEPT TIME OUT\n"));
+							if(errno==ENOBUFS||errno==ENOMEM)ERROR_OUT2_(stderr,ENCODE_("BUF LEAK"));
+							continue;
 						};
 						ERROR_OUT_(stderr,ENCODE_("ACCEPT IS FINISH\n"));
 						event_Add(connect_list,epoll_fd,client_fd,EPOLLIN|EPOLLET,&head_mod);
@@ -308,6 +322,9 @@ int main(int argc,char *argv[])
 	int epoll_fd;
 	C_HASH connect_list;
 
+	/*some options*/
+	int sock_op;
+
 	SET_LOCALE_("");
 	if(argc>1&&argc<3)
 	{
@@ -328,6 +345,8 @@ int main(int argc,char *argv[])
 	if((bind(listenfd,(struct sockaddr*)&io_config.addr,sizeof(server)))==-1)goto fail_return;
 	if(listen(listenfd,io_config.poll_length)==-1)goto fail_return;
 	/*fd_Setnonblocking(listenfd);*/
+	sock_op=1;
+	setsockopt(listenfd,SOL_SOCKET,SO_REUSEADDR,&sock_op,sizeof(sock_op));
 	
 	/*now create an epoll pool*/
 	epoll_fd=epoll_create(io_config.poll_length);
