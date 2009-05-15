@@ -131,7 +131,6 @@ C_HASH* event_Add(C_HASH *table,int epoll_fd,int fd,uint32_t event,MOD_T *mod)
 	
 	if(epoll_ctl(epoll_fd,EPOLL_CTL_ADD,fd,&io_event)!=-1)
 	{
-		epoll_ctl(epoll_fd,EPOLL_CTL_ADD,fd,&io_event);
 		connect.fd=fd;
 		connect.mod=mod;
 		hash_Append(table,&connect);
@@ -139,8 +138,8 @@ C_HASH* event_Add(C_HASH *table,int epoll_fd,int fd,uint32_t event,MOD_T *mod)
 	}
 	else
 	{
-		ERROR_OUT_(stderr,ENCODE_("ERRNO:%d\n"),errno);
-		if(errno==EBADF)ERROR_OUT_(stderr,ENCODE_("THE FD IS ERROR\n"));
+		ERROR_OUT2_(stderr,ENCODE_("ERROR ON ADD EVENT\n"),errno);
+		if(errno==EBADF)ERROR_OUT2_(stderr,ENCODE_("THE FD IS ERROR\n"));
 		return NULL;
 	};
 	return table;
@@ -179,8 +178,8 @@ C_HASH* event_Delete(C_HASH *table,HTTP_CONNECT *connect,int epoll_fd,int fd)
 	io_event.data.fd=fd;
 	if(epoll_ctl(epoll_fd,EPOLL_CTL_DEL,fd,&io_event)==-1)
 	{
-		ERROR_OUT_(stderr,ENCODE_("ERRNO:%d\n"),errno);
-		if(errno==ENOENT)ERROR_OUT_(stderr,ENCODE_("NO IN EPOLLFD\n"));
+		ERROR_OUT_(stderr,ENCODE_("ERROR ON EVENT DELETE\n"),errno);
+		if(errno==ENOENT)ERROR_OUT2_(stderr,ENCODE_("NO IN EPOLLFD\n"));
 		if(errno==EBADF)ERROR_OUT_(stderr,ENCODE_("NO A VALID FD\n"));
 	};
 	hash_Remove(table,connect);

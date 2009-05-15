@@ -239,6 +239,11 @@ int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect)
 						{
 							close(id->connect_fd);
 							close(id->file_fd);
+							if(id->buf!=NULL)
+							{
+								free(id->buf);
+								id->buf=NULL;
+							};
 							hash_Remove(&config->id_list,id);
 							ERROR_OUT_(stderr,ENCODE_("close:step 1\n"));
 							return WORK_CLOSE_;
@@ -275,6 +280,11 @@ int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect)
 						{
 							close(id->connect_fd);
 							close(id->file_fd);
+							if(id->buf!=NULL)
+							{
+								free(id->buf);
+								id->buf=NULL;
+							};
 							hash_Remove(&config->id_list,id);
 							ERROR_OUT_(stderr,ENCODE_("close:step 2\n"));
 							return WORK_CLOSE_;
@@ -286,6 +296,11 @@ int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect)
 						{
 							close(id->connect_fd);
 							close(id->file_fd);
+							if(id->buf!=NULL)
+							{
+								free(id->buf);
+								id->buf=NULL;
+							};
 							hash_Remove(&config->id_list,id);
 							ERROR_OUT_(stderr,ENCODE_("close:step 2\n"));
 							return WORK_CLOSE_;
