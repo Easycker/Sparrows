@@ -308,6 +308,12 @@ fail_return:
 	exit(1);
 };
 
+void sig_Int(int sig)
+{
+	ERROR_OUT2_(stderr,ENCODE_("SIGINT RECV\n"));
+	exit(0);
+};
+
 int main(int argc,char *argv[])
 {
 	/*a mpm using epoll*/
@@ -340,6 +346,7 @@ int main(int argc,char *argv[])
 	};
 
 	signal(SIGPIPE,SIG_IGN);
+	signal(SIGINT,&sig_Int);
 	if((listenfd=socket(AF_INET,SOCK_STREAM,0))==-1)goto fail_return;
 	if((bind(listenfd,(struct sockaddr*)&io_config.addr,sizeof(server)))==-1)goto fail_return;
 	if(listen(listenfd,io_config.poll_length)==-1)goto fail_return;

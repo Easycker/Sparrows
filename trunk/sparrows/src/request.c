@@ -67,7 +67,7 @@ HTTP_REQUEST* request_Head(HTTP_REQUEST *request,C_ARRAY CHAR_* const string)
 
 	i=0;
 	end_char=ENCODE_('\0');
-	string_Set(&request->recv_data,string);
+	/*string_Set(&request->recv_data,string);*/
 	op=string;
 	if(*op==ENCODE_('G'))request->type=GET;
 	else if(*op==ENCODE_('P'))request->type=POST;
