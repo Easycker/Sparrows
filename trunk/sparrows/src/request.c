@@ -4,7 +4,6 @@ HTTP_REQUEST* request_Create(HTTP_REQUEST *request)
 {
 	int i;
 
-	request->recv_data=string_Create();
 	request->path=string_Create();
 	request->host=string_Create();
 	request->accept=string_Create();
@@ -67,7 +66,6 @@ HTTP_REQUEST* request_Head(HTTP_REQUEST *request,C_ARRAY CHAR_* const string)
 
 	i=0;
 	end_char=ENCODE_('\0');
-	/*string_Set(&request->recv_data,string);*/
 	op=string;
 	if(*op==ENCODE_('G'))request->type=GET;
 	else if(*op==ENCODE_('P'))request->type=POST;
@@ -130,9 +128,10 @@ HTTP_REQUEST* request_Head(HTTP_REQUEST *request,C_ARRAY CHAR_* const string)
 	return NULL;
 };
 
-void request_Free(HTTP_REQUEST *request)
+void request_Free(HTTP_REQUEST *request,HEAD_SHARE *head_share)
 {
-	string_Drop(&request->recv_data);
+	pool_Free(request->recv_data,&(head_share->head_pool));
+
 	string_Drop(&request->path);
 	string_Drop(&request->host);
 	string_Drop(&request->accept);
@@ -160,10 +159,9 @@ BOOL_ head_Ensure(HEAD_FD *lhs,HEAD_FD *rhs)
 
 void head_Free(HEAD_FD *fd)
 {
-	array_Drop(&fd->buf);
 };
 
-HEAD_SHARE* head_Init(size_t buf_size,C_ARRAY HOST_TYPE *host_list)
+HEAD_SHARE* head_Init(size_t buf_size,UINT_ max_head,C_ARRAY HOST_TYPE *host_list)
 {
 	HEAD_SHARE *share;
 
@@ -173,7 +171,9 @@ HEAD_SHARE* head_Init(size_t buf_size,C_ARRAY HOST_TYPE *host_list)
 		ERROR_OUT_(stderr,ENCODE_("SHARE IS NULL\n"));
 		return NULL;
 	};
+	share->max_head=max_head;
 	hash_Create_Ex(&share->fd_list,&head_Tinyhash,&head_Ensure,sizeof(HEAD_FD),(UINT_)HASH_SPACE_,&head_Free);
+	pool_Create(&(share->head_pool),share->max_head);
 	share->buf_size=buf_size;
 	share->host_list=host_list;
 	return share;
@@ -201,21 +201,19 @@ int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect)
 	{
 		ERROR_OUT_(stderr,ENCODE_("HERE CREATE A NEW HEAD\n"));
 		fake_head.fd=connect->fd;
-		fake_head.buf=array_Create(sizeof(char));
-		array_Resize(&fake_head.buf,share->buf_size);
+		fake_head.buf_len=0;
+		fake_head.buf=pool_Malloc(&(share->head_pool));
 		hash_Append(&share->fd_list,&fake_head);
 		head=hash_Get(&share->fd_list,&fake_head);
 	};
-	array_Resize(&head->buf,array_Head(head->buf)->array_space+share->buf_size);
 	while(1)
 	{
-		len=recv(head->fd,&head->buf[array_Length(head->buf)],share->buf_size,0);
+		len=recv(head->fd,&head->buf[head->buf_len],share->buf_size,0);
 		if(len<0)
 		{
 			if(errno==EAGAIN)
 			{
-				array_Length(head->buf)+=share->buf_size;
-				array_Head(head->buf)->array_space+=share->buf_size;
+				head->buf_len+=share->buf_size;
 				array_Drop(&cache_ansi);
 				return WORK_GOON_;
 			}
@@ -229,13 +227,14 @@ int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect)
 		{
 			ERROR_OUT_(stderr,ENCODE_("HEAD RECV DONE,THE FD IS;%d\n"),connect->fd);
 			/*all data had been recv*/
-			array_Length(head->buf)+=len;
-			head->buf[array_Length(head->buf)]='\0';
+			head->buf_len+=len;
+			head->buf[head->buf_len]='\0';
 			head_data=string_Create();
 			if(head_data==NULL)goto fail_return;
 			if(string_Ansitowide(&head_data,head->buf)==NULL)goto fail_return;
 			/*anlysis the head*/
 			if(request_Create(&request)==NULL)goto fail_return;
+			request.recv_data=head->buf;
 			if(request_Head(&request,head_data)==NULL)goto fail_return;
 			/*release the resources*/
 			string_Drop(&head_data);
@@ -259,13 +258,13 @@ int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect)
 						{
 							if(state&SELECT_BREAK_)
 							{
-								request_Free(&request);
+								request_Free(&request,share);
 								array_Drop(&cache_ansi);
 								return WORK_CLOSE_;
 							};
 							if((state&SELECT_INPUT_)||(state&SELECT_OUTPUT_))
 							{
-								request_Free(&request);
+								request_Free(&request,share);
 								connect->mod=&share->host_list[i].mod_config.mod_table[j];
 								if(state&SELECT_INPUT_)return_state|=WORK_INPUT_;
 								else return_state|=WORK_OUTPUT_;
@@ -275,13 +274,13 @@ int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect)
 							};
 						};
 					};
-					request_Free(&request);
+					request_Free(&request,share);
 					array_Drop(&cache_ansi);
 					ERROR_OUT_(stderr,ENCODE_("NO MOD TO WORK?NO POSSIBLE\n"));
 					return WORK_CLOSE_;
 				};
 			};	
-			request_Free(&request);
+			request_Free(&request,share);
 			array_Drop(&cache_ansi);
 			ERROR_OUT_(stderr,ENCODE_("NO HOST FOUND\n"));
 			return WORK_CLOSE_;
@@ -289,8 +288,7 @@ int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect)
 		else
 		{
 			/*there are still datas to recv*/
-			array_Length(head->buf)+=share->buf_size;
-			array_Head(head->buf)->array_space+=share->buf_size;
+			head->buf_len+=share->buf_size;
 		};
 	};
 fail_return:

@@ -37,6 +37,8 @@ IO_CONFIG* io_Init(IO_CONFIG *config,FILE *fp)
 	config->io_buf=STRTOUL_(cache,NULL,0);
 	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("poll_length"),doc_root),&doc);
 	config->poll_length=STRTOUL_(cache,NULL,0);
+	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("max_header"),doc_root),&doc);
+	config->max_head=STRTOUL_(cache,NULL,0);
 
 	/*now read the config of virtual host*/
 	config->host_list=array_Create(sizeof(HOST_TYPE));
@@ -207,7 +209,7 @@ int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
 
 	MOD_T head_mod;
 	/*init the head_mod*/
-	head_mod.share=head_Init(512,config->host_list);
+	head_mod.share=head_Init(512,config->max_head,config->host_list);
 	if(head_mod.share==NULL)goto fail_return;
 	head_mod.mod_Work=&head_Work;
 
@@ -348,11 +350,11 @@ int main(int argc,char *argv[])
 	signal(SIGPIPE,SIG_IGN);
 	signal(SIGINT,&sig_Int);
 	if((listenfd=socket(AF_INET,SOCK_STREAM,0))==-1)goto fail_return;
+	sock_op=1;
+	setsockopt(listenfd,SOL_SOCKET,SO_REUSEADDR,&sock_op,sizeof(sock_op));
 	if((bind(listenfd,(struct sockaddr*)&io_config.addr,sizeof(server)))==-1)goto fail_return;
 	if(listen(listenfd,io_config.poll_length)==-1)goto fail_return;
 	/*fd_Setnonblocking(listenfd);*/
-	sock_op=1;
-	setsockopt(listenfd,SOL_SOCKET,SO_REUSEADDR,&sock_op,sizeof(sock_op));
 	
 	/*now create an epoll pool*/
 	epoll_fd=epoll_create(io_config.poll_length);

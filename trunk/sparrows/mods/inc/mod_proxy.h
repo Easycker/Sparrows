@@ -43,8 +43,8 @@ typedef struct proxy_owner
 	int in_fd;
 	int remote_fd;
 	int state;
-	char *buf;
-	int buf_len;
+	int buf_fd[2];
+	int data_left;
 	BOOL_ in_ready;
 	BOOL_ remote_ready;
 }PROXY_OWNER;

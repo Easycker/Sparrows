@@ -1,7 +1,7 @@
 #ifndef SHTTPD_TYPE_H
 #define SHTTPD_TYPE_H
 
-/*#define DEBUG_*/
+#define DEBUG_
 #define DEBUG2_
 #ifdef DEBUG_
 #define ERROR_OUT_ FPRINTF_
@@ -49,7 +49,7 @@ typedef enum request_type
 
 typedef struct http_request
 {
-	C_STRING recv_data;
+	char *recv_data;
 
 	REQUEST_TYPE type;
 	C_STRING path;

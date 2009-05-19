@@ -21,6 +21,10 @@ int fd_Setnonblocking(int fd)
 	return op;
 };
 
+int socket_Transport(int in_fd,int out_fd,char *buf,int buf_size,int *left_buf)
+{
+};
+
 PROXY_CONFIG* mod_Init(CHAR_ const *arg)
 {
 	XML_DOC doc;
@@ -109,6 +113,8 @@ int mod_Select(PROXY_CONFIG *config,HTTP_REQUEST *request,int fd)
 					connect_owner.in_ready=FALSE_;
 					connect_owner.remote_ready=FALSE_;
 					connect_owner.state=STATE_CONNECT_;
+					if(pipe(connect_owner.buf_fd)<0)goto fail_return;
+					connect_owner.data_left=0;
 					chain_Append(&connect_owner,&config->owner_list);
 					connect_id.fd=fd;
 					connect_id.owner=(PROXY_OWNER*)chain_Tail(&config->owner_list);
@@ -128,6 +134,8 @@ int mod_Select(PROXY_CONFIG *config,HTTP_REQUEST *request,int fd)
 				connect_owner.in_ready=FALSE_;
 				connect_owner.remote_ready=TRUE_;
 				connect_owner.state=STATE_SEND_;
+				if(pipe(connect_owner.buf_fd)<0)goto fail_return;
+				connect_owner.data_left=0;
 				chain_Append(&connect_owner,&config->owner_list);
 				connect_id.fd=fd;
 				connect_id.owner=(PROXY_OWNER*)chain_Tail(&config->owner_list);
@@ -155,37 +163,186 @@ int mod_Work(PROXY_CONFIG *config,HTTP_CONNECT *connect)
 	PROXY_ID *id;
 	int len;
 	int sock_op;
+	int flag[2];
 
 	ERROR_OUT_(stderr,ENCODE_("MOD_PROXY STARTED\n"));
-	if(connect_fd.fd==connect_fd.owner->in_fd)connect_fd.owner->in_ready=TRUE_;
-	else if(connect_fd.fd==connect_fd.owner->remote_fd)
+	fake_id.fd=connect->fd;
+	id=hash_Get(&config->id_list,&fake_id);
+	if(id!=NULL)
 	{
-		if(connect_fd.owner->state==STATE_CONNECT_)
+		if(id->fd==id->owner->in_fd)id->owner->in_ready=TRUE_;
+		else if(id->fd==id->owner->remote_fd)
 		{
-			connect_fd.owner->state=STATE_SEND_;
-			return WORK_OUTPUT_;
-		};
-		connect_fd.owner->remote_ready=TRUE_;
-	};
-	else goto fail_return;
+			if(id->owner->state==STATE_CONNECT_)
+			{
+				id->owner->state=STATE_SEND_;
+				return WORK_OUTPUT_;
+			};
+			id->owner->remote_ready=TRUE_;
+		}
+		else goto fail_return;
 
-	if(connect_fd.owner->in_ready==TRUE_&&connect_fd.owner->remote_ready==TRUE_)
-	{
-		switch(connect_fd.owner->state)
+		if(id->owner->in_ready==TRUE_&&id->owner->remote_ready==TRUE_)
 		{
-			case:STATE_CONNECT_
-			     {
-				     /*impossible*/
-				     break;
-			     };
-			case:STATE_SEND_
-			     {
-				     break;
-			     };
-			case:STATE_RECV_
-			     {
-				     break;
-			     };
+			switch(id->owner->state)
+			{
+				case STATE_CONNECT_:
+				     {
+					     /*impossible*/
+					     break;
+				     };
+				case STATE_SEND_:
+				     {
+					     if(id->owner->data_left>0)if(splice(id->owner->buf_fd[0],NULL,id->owner->remote_fd,NULL,config->buf_size,SPLICE_F_NONBLOCK)<0)
+					     {
+						     if(errno==EAGAIN)
+						     {
+							     id->owner->remote_ready=FALSE_;
+							     return WORK_GOON_;
+						     }
+						     else
+						     {
+							     return WORK_CLOSE_;
+						     };
+					     };
+					     while(1)
+					     {
+						     len=splice(id->owner->in_fd,NULL,id->owner->buf_fd[1],NULL,config->buf_size,SPLICE_F_NONBLOCK);
+						     if(len<0)
+						     {
+							     if(errno==EAGAIN)
+							     {
+								     id->owner->in_ready=FALSE_;
+								     return WORK_GOON_;
+							     }
+							     else
+							     {
+								     return WORK_CLOSE_;
+							     };
+						     }
+						     else
+						     {
+							     if(len>=config->buf_size)
+							     {
+								     while(1)
+								     {
+									     len=splice(id->owner->buf_fd[0],NULL,id->owner->remote_fd,NULL,config->buf_size,SPLICE_F_NONBLOCK);
+									     if(len<0)
+									     {
+										     if(errno==EAGAIN)
+										     {
+											     id->owner->remote_ready=FALSE_;
+											     id->owner->data_left=len;
+											     return WORK_GOON_;
+										     }
+										     else
+										     {
+											     return WORK_CLOSE_;
+										     };
+									     }
+									     else if(len==0||len>=config->buf_size)break;
+									     /*else if(len<config->buf_size)continue;*/
+								     };
+							     }
+							     else
+							     {
+								     while(1)
+								     {
+									     len=splice(id->owner->buf_fd[0],NULL,id->owner->remote_fd,NULL,config->buf_size,SPLICE_F_NONBLOCK);
+									     if(len<0)
+									     {
+										     if(errno==EAGAIN)
+										     {
+											     id->owner->remote_ready=FALSE_;
+											     id->owner->data_left=len;
+											     return WORK_GOON_;
+										     }
+										     else
+										     {
+											     return WORK_CLOSE_;
+										     };
+									     }
+									     else if(len==0||len>=config->buf_size)
+									     {
+										     /*send done change to recv*/
+										     id->owner->state=STATE_RECV_;
+										     len=id->owner->in_fd;
+										     id->owner->in_fd=id->owner->remote_fd;
+										     id->owner->remote_fd=len;
+										     return WORK_GOON_;
+									     };
+									     /*else if(len<config->buf_size)continue;*/
+								     };
+							     };
+						     };
+					     };
+					     /*
+					     if(id->owner->buf_len>0)
+					     {
+						     len=send(id->owner->remote_fd,id->owner->buf,id->owner->buf_len,0);
+						     if(len>0)
+						     {
+							     if(len>=id->owner->buf_len)flag[0]=1;
+							     while(1)
+							     {
+								     flag[1]=0;
+								     len=recv(id->owner->in_fd,id->owner->buf,config->buf_size,0);
+								     if(len>0)
+								     {
+									     if(len>=config->buf_size)flag[1]=1;
+									     while(len>0)
+									     {
+										     len=send(id->owner->remote_fd,id->owner->buf,len,0);
+										     if(len<0)
+										     {
+											     if(errno==EAGAIN)
+											     {
+												     id->owner->remote_ready=FALSE_;
+												     id->owner->buf_len=len;
+												     return WORK_GOON_;
+											     }
+											     else return WORK_CLOSE_;
+										     };
+									     };
+									     if(flag[1]==0)break;
+								     }
+								     else
+								     {
+									     if(errno==EAGAIN)
+									     {
+										     id->owner->in_ready=FALSE_;
+										     id->owner->buf_len=0;
+										     return WORK_GOON_;
+									     }
+									     else
+									     {
+										     return WORK_CLOSE_;
+									     };
+								     };
+							     };
+							     if(flag[0]==0)break;
+						     }
+						     else
+						     {
+							     if(len<0)
+							     {
+								     if(errno==EAGAIN)
+								     {
+									     id->owner->buf_len=len;
+									     return WORK_GOON_;
+								     }
+								     else return WORK_CLOSE_;
+							     };
+						     };
+					     };
+					     */
+					     break;
+				     };
+				case STATE_RECV_:
+				     {
+					     break;
+				     };
+			};
 		};
 	};
 

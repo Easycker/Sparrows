@@ -26,6 +26,7 @@ typedef struct io_config
 	UINT_ http_port;
 	int io_buf;
 	int poll_length;
+	UINT_ max_head;
 	C_ARRAY HOST_TYPE *host_list;
 }IO_CONFIG;
 
