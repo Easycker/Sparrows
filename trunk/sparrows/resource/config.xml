@@ -2,8 +2,11 @@
 	<http_interface>0</http_interface>
 	<http_port>8805</http_port>
 	<io_buf>8192</io_buf>
-	<poll_length>8192</pool_length>
+	<pool_length>8192</pool_length>
 	<max_header>2048</max_header>
+	<pool_timeout>1000</pool_timeout>
+	<keep_alive>5</keep_alive>
+	<timeout>10</timeout>
 	<hosts>
 		<localhost>
 			<regex>"localhost"</regex>

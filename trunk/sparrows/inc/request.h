@@ -44,4 +44,6 @@ HEAD_SHARE* head_Init(size_t buf_size,UINT_ max_head,C_ARRAY HOST_TYPE *host_lis
 
 int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect);
 
+void head_Close(HEAD_SHARE *share,HTTP_CONNECT *connect);
+
 #endif

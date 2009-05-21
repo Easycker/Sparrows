@@ -30,6 +30,8 @@
 
 #define NEW_LINE_ ENCODE_("\r\n")
 
+#define NEW_LINE_ANSI_ "\r\n\r\n"
+
 typedef struct mime
 {
 	C_STRING mime_dot;

@@ -289,9 +289,22 @@ int head_Work(HEAD_SHARE *share,HTTP_CONNECT *connect)
 		{
 			/*there are still datas to recv*/
 			head->buf_len+=share->buf_size;
+			if(head->buf_len>share->max_head)
+			{
+				/*header too large*/
+				ERROR_OUT_(stderr,ENCODE_("http header too large\n"));
+				request_Free(&request,share);
+				array_Drop(&cache_ansi);
+				return WORK_CLOSE_;
+			};
 		};
 	};
 fail_return:
 	array_Drop(&cache_ansi);
 	return WORK_CLOSE_;
+};
+
+void head_Close(HEAD_SHARE *share,HTTP_CONNECT *connect)
+{
+	/*nothing to do*/
 };

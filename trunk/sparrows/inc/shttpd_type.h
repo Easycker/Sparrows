@@ -1,8 +1,8 @@
 #ifndef SHTTPD_TYPE_H
 #define SHTTPD_TYPE_H
 
-#define DEBUG_
-#define DEBUG2_
+/*#define DEBUG_*/
+/*#define DEBUG2_*/
 #ifdef DEBUG_
 #define ERROR_OUT_ FPRINTF_
 #else
@@ -28,6 +28,7 @@
 #define WORK_INPUT_ 0x000f0000
 #define WORK_OUTPUT_ 0x0000f000
 #define WORK_UNLOAD_ 0x00000f00
+#define WORK_KEEP_ 0x000000f0
 
 #include <regex.h>
 
@@ -71,7 +72,7 @@ typedef struct mod_t
 	int (*mod_Select)();
 	int (*mod_Work)();
 	int (*mod_Addport)();
-	int (*mod_Close)();
+	void (*mod_Close)();
 	int (*mod_Unload)();
 }MOD_T;
 

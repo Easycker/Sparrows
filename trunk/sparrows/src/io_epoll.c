@@ -35,10 +35,16 @@ IO_CONFIG* io_Init(IO_CONFIG *config,FILE *fp)
 	config->addr.sin_port=htons(STRTOUL_(cache,NULL,0));
 	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("io_buf"),doc_root),&doc);
 	config->io_buf=STRTOUL_(cache,NULL,0);
-	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("poll_length"),doc_root),&doc);
-	config->poll_length=STRTOUL_(cache,NULL,0);
+	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("pool_length"),doc_root),&doc);
+	config->pool_length=STRTOUL_(cache,NULL,0);
 	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("max_header"),doc_root),&doc);
 	config->max_head=STRTOUL_(cache,NULL,0);
+	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("pool_timeout"),doc_root),&doc);
+	config->pool_timeout=STRTOUL_(cache,NULL,0);
+	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("keep_alive"),doc_root),&doc);
+	config->keep_alive=STRTOUL_(cache,NULL,0);
+	xml_Storedata(&cache,xml_Nodebyname(ENCODE_("timeout"),doc_root),&doc);
+	config->timeout=STRTOUL_(cache,NULL,0);
 
 	/*now read the config of virtual host*/
 	config->host_list=array_Create(sizeof(HOST_TYPE));
@@ -185,23 +191,33 @@ fail_return:
 	return;
 };
 
-void event_Active(C_HASH *table,C_DCHAIN *connect_chain,HTTP_CONNECT *connect,int epoll_fd)
+void event_Active(C_HASH *table,C_DCHAIN *connect_chain,HTTP_CONNECT *connect,HTTP_CONNECT **timeout,int epoll_fd)
 {
-	time_t current_time;
 	HTTP_CONNECT *next;
 
-	if(connect_chain->dchain_head!=connect)
+	if(connect_chain->dchain_length>1)
 	{
-		time(&current_time);
+		ERROR_OUT_(stderr,ENCODE_("ACTIVE START\n"));
 		next=(HTTP_CONNECT*)dchain_Next(connect);
-		if((((current_time-next->last_op)>10)&&(next->op_done==TRUE_))||((current_time-next->last_op)>30))
+		if(connect_chain->dchain_head!=connect)
 		{
-			/*Keep-alive timeout or Connect timeout*/
-			ERROR_OUT_(stderr,ENCODE_("CONNECT TIMEOUT\n"));
-			next->mod->mod_Close(next->mod->share,next);
-			event_Delete(table,connect_chain,next,epoll_fd,next->fd);
+			if(next==NULL)ERROR_OUT_(stderr,ENCODE_("EMPTY NEXT\n"));
+			*timeout=next;
+			dchain_Next(dchain_Prev(connect))=dchain_Next(connect);
+			if(dchain_Next(connect)!=NULL)dchain_Prev(dchain_Next(connect))=dchain_Prev(connect);
+			else connect_chain->dchain_tail=dchain_Prev(connect);
+			dchain_Next(connect)=connect_chain->dchain_head;
+			dchain_Prev(connect_chain->dchain_head)=connect;
+			dchain_Prev(connect)=NULL;
+			connect_chain->dchain_head=connect;
+		}
+		else
+		{
+			*timeout=next;
 		};
-	};
+	}
+	else if(connect_chain->dchain_length=1)*timeout=connect;
+	time(&connect->last_op);
 };
 
 C_HASH* event_Delete(C_HASH *table,C_DCHAIN *chain,HTTP_CONNECT *connect,int epoll_fd,int fd)
@@ -230,6 +246,7 @@ int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONF
 	int wait_fd;
 	HTTP_CONNECT fake_connect;
 	HTTP_CONNECT *current_connect;
+	HTTP_CONNECT *timeout_connect;
 	int client_fd;
 	struct sockaddr_in client;
 	struct epoll_event io_event;
@@ -249,12 +266,14 @@ int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONF
 	head_mod.share=head_Init((config->max_head)/2,config->max_head,config->host_list);
 	if(head_mod.share==NULL)goto fail_return;
 	head_mod.mod_Work=&head_Work;
+	head_mod.mod_Close=&head_Close;
 
 	len=sizeof(client);
-	events=(struct epoll_event*)malloc(sizeof(struct epoll_event)*(config->poll_length));
+	events=(struct epoll_event*)malloc(sizeof(struct epoll_event)*(config->pool_length));
+	timeout_connect=NULL;
 	while(1)
 	{
-		wait_fd=epoll_wait(epoll_fd,events,config->poll_length,-1);
+		wait_fd=epoll_wait(epoll_fd,events,config->pool_length,config->pool_timeout);
 		if(wait_fd>0)
 		{
 			for(i=0;i<wait_fd;++i)
@@ -309,7 +328,17 @@ int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONF
 							{
 								/*delete the epoll event but not close the port*/
 								ERROR_OUT_(stderr,ENCODE_("CONNECT IS DOWN\n"));
+								close(current_connect->fd);
+								timeout_connect=NULL;
 								event_Delete(connect_list,connect_chain,current_connect,epoll_fd,current_connect->fd);
+							}
+							else if(state&WORK_KEEP_)
+							{
+								ERROR_OUT_(stderr,ENCODE_("KEEP ALIVE\n"));
+								event_Active(connect_list,connect_chain,current_connect,&timeout_connect,epoll_fd);
+								current_connect->op_done=TRUE_;
+								current_connect->mod=&head_mod;
+								event_Mod(epoll_fd,current_connect->fd,EPOLLIN|EPOLLET);
 							}
 							else
 							{
@@ -327,6 +356,7 @@ int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONF
 									ERROR_OUT_(stderr,ENCODE_("GOON WORK\n"));
 									/*event_Keep();*/
 								};
+								event_Active(connect_list,connect_chain,current_connect,&timeout_connect,epoll_fd);
 							};
 							if(state&WORK_NEWPORT_)
 							{
@@ -339,6 +369,26 @@ int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONF
 						}while(retry==TRUE_);
 					};
 				};
+			};
+		};
+		/*things after epoll_wait*/
+		time(&now_time);
+		if(timeout_connect!=NULL)
+		{
+			ERROR_OUT_(stderr,ENCODE_("TIMEOUT HAD BEEN SET\n"));
+			if((((now_time-timeout_connect->last_op)>config->keep_alive)&&(timeout_connect->op_done==TRUE_))||((now_time-timeout_connect->last_op)>config->timeout))
+			{
+				/*Keep-alive timeout or Connect timeout*/
+				ERROR_OUT2_(stderr,ENCODE_("CONNECT TIMEOUT\n"));
+				do
+				{
+					current_connect=timeout_connect;
+					timeout_connect=dchain_Next(timeout_connect);
+					current_connect->mod->mod_Close(current_connect->mod->share,current_connect);
+					close(current_connect->fd);
+					event_Delete(connect_list,connect_chain,current_connect,epoll_fd,current_connect->fd);
+				}while(timeout_connect!=NULL);
+				timeout_connect=NULL;
 			};
 		};
 	};
@@ -390,11 +440,11 @@ int main(int argc,char *argv[])
 	sock_op=1;
 	setsockopt(listenfd,SOL_SOCKET,SO_REUSEADDR,&sock_op,sizeof(sock_op));
 	if((bind(listenfd,(struct sockaddr*)&io_config.addr,sizeof(server)))==-1)goto fail_return;
-	if(listen(listenfd,io_config.poll_length)==-1)goto fail_return;
+	if(listen(listenfd,io_config.pool_length)==-1)goto fail_return;
 	/*fd_Setnonblocking(listenfd);*/
 	
 	/*now create an epoll pool*/
-	epoll_fd=epoll_create(io_config.poll_length);
+	epoll_fd=epoll_create(io_config.pool_length);
 	hash_Create(&connect_list,&connect_Tinyhash,&connect_Ensure,sizeof(HTTP_CONNECT*),(UINT_)HASH_SPACE_+1);
 	dchain_Create(&connect_chain,sizeof(HTTP_CONNECT));
 

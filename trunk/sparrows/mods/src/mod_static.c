@@ -237,15 +237,7 @@ int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect)
 						if(errno==EAGAIN)return WORK_GOON_;
 						else 
 						{
-							close(id->connect_fd);
-							close(id->file_fd);
-							if(id->buf!=NULL)
-							{
-								free(id->buf);
-								id->buf=NULL;
-							};
-							hash_Remove(&config->id_list,id);
-							ERROR_OUT_(stderr,ENCODE_("close:step 1\n"));
+							mod_Close(config,connect);
 							return WORK_CLOSE_;
 						};
 					}
@@ -278,15 +270,7 @@ int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect)
 						}
 						else
 						{
-							close(id->connect_fd);
-							close(id->file_fd);
-							if(id->buf!=NULL)
-							{
-								free(id->buf);
-								id->buf=NULL;
-							};
-							hash_Remove(&config->id_list,id);
-							ERROR_OUT_(stderr,ENCODE_("close:step 2\n"));
+							mod_Close(config,connect);
 							return WORK_CLOSE_;
 						};
 					}
@@ -294,15 +278,7 @@ int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect)
 					{
 						if(id->send_off>=id->file_size)
 						{
-							close(id->connect_fd);
-							close(id->file_fd);
-							if(id->buf!=NULL)
-							{
-								free(id->buf);
-								id->buf=NULL;
-							};
-							hash_Remove(&config->id_list,id);
-							ERROR_OUT_(stderr,ENCODE_("close:step 2\n"));
+							mod_Close(config,connect);
 							return WORK_CLOSE_;
 						};
 					}
@@ -318,7 +294,24 @@ int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect)
 
 int mod_Addport(STATIC_CONFIG *config,HTTP_CONNECT *connect,PORT_APPLY *apply)
 {
-	return WORK_CLOSE_;
+	return -1;
+};
+
+void mod_Close(STATIC_CONFIG *config,HTTP_CONNECT *connect)
+{
+	STATIC_ID fake_id;
+	STATIC_ID *id;
+
+	fake_id.connect_fd=connect->fd;
+	id=hash_Get(&config->id_list,&fake_id);
+	close(id->file_fd);
+	if(id->buf!=NULL)
+	{
+		free(id->buf);
+		id->buf=NULL;
+	};
+	hash_Remove(&config->id_list,id);
+	ERROR_OUT_(stderr,ENCODE_("close\n"));
 };
 
 void mod_Unload(STATIC_CONFIG *config)

@@ -27,7 +27,10 @@ typedef struct io_config
 	struct sockaddr_in addr;
 	UINT_ http_port;
 	int io_buf;
-	int poll_length;
+	int pool_length;
+	int pool_timeout;
+	int keep_alive;
+	int timeout;
 	UINT_ max_head;
 	C_ARRAY HOST_TYPE *host_list;
 }IO_CONFIG;
@@ -44,7 +47,7 @@ C_HASH* event_Add(C_HASH *table,C_DCHAIN *chain,int epoll_fd,int fd,uint32_t eve
 
 void event_Mod(int epoll_fd,int fd,uint32_t event);
 
-void event_Active(C_HASH *table,C_DCHAIN *connect_chain,HTTP_CONNECT *connect,int epoll_fd);
+void event_Active(C_HASH *table,C_DCHAIN *connect_chain,HTTP_CONNECT *connect,HTTP_CONNECT **timeout,int epoll_fd);
 
 C_HASH* event_Delete(C_HASH *table,C_DCHAIN *chain,HTTP_CONNECT *connect,int epoll_fd,int fd);
 
