@@ -100,14 +100,14 @@ fail_return:
 	return NULL;
 };
 
-UINT_ connect_Tinyhash(HTTP_CONNECT *connect)
+UINT_ connect_Tinyhash(HTTP_CONNECT **connect)
 {
-	return connect->fd&HASH_SPACE_;
+	return (*connect)->fd&HASH_SPACE_;
 };
 
-BOOL_ connect_Ensure(HTTP_CONNECT *lhs,HTTP_CONNECT *rhs)
+BOOL_ connect_Ensure(HTTP_CONNECT **lhs,HTTP_CONNECT **rhs)
 {
-	return lhs->fd==rhs->fd;
+	return (*lhs)->fd==(*rhs)->fd;
 };
 
 int fd_Setnonblocking(int fd)
@@ -121,10 +121,11 @@ int fd_Setnonblocking(int fd)
 	return op;
 };
 
-C_HASH* event_Add(C_HASH *table,int epoll_fd,int fd,uint32_t event,MOD_T *mod)
+C_HASH* event_Add(C_HASH *table,C_DCHAIN *chain,int epoll_fd,int fd,uint32_t event,MOD_T *mod)
 {
 	HTTP_CONNECT connect;
 	struct epoll_event io_event;
+	HTTP_CONNECT *inserted_con;
 
 	memset(&io_event,0,sizeof(struct epoll_event));
 	io_event.data.fd=fd;
@@ -135,7 +136,21 @@ C_HASH* event_Add(C_HASH *table,int epoll_fd,int fd,uint32_t event,MOD_T *mod)
 	{
 		connect.fd=fd;
 		connect.mod=mod;
-		hash_Append(table,&connect);
+		if(time(&connect.last_op)<0)goto fail_return;
+		connect.op_done=FALSE_;
+		if(mod!=NULL)
+		{
+			if(chain->dchain_head==NULL)inserted_con=dchain_Append(&connect,chain);
+			else inserted_con=dchain_Insert(&connect,chain->dchain_head,chain);
+			hash_Append(table,&inserted_con);
+		}
+		else
+		{
+			inserted_con=malloc(sizeof(HTTP_CONNECT));
+			if(inserted_con==NULL)goto fail_return;
+			memcpy(inserted_con,&connect,sizeof(HTTP_CONNECT));
+			hash_Append(table,&inserted_con);
+		};
 		ERROR_OUT_(stderr,ENCODE_("ADD A FD,IT'S %d\n"),connect.fd);
 	}
 	else
@@ -170,7 +185,26 @@ fail_return:
 	return;
 };
 
-C_HASH* event_Delete(C_HASH *table,HTTP_CONNECT *connect,int epoll_fd,int fd)
+void event_Active(C_HASH *table,C_DCHAIN *connect_chain,HTTP_CONNECT *connect,int epoll_fd)
+{
+	time_t current_time;
+	HTTP_CONNECT *next;
+
+	if(connect_chain->dchain_head!=connect)
+	{
+		time(&current_time);
+		next=(HTTP_CONNECT*)dchain_Next(connect);
+		if((((current_time-next->last_op)>10)&&(next->op_done==TRUE_))||((current_time-next->last_op)>30))
+		{
+			/*Keep-alive timeout or Connect timeout*/
+			ERROR_OUT_(stderr,ENCODE_("CONNECT TIMEOUT\n"));
+			next->mod->mod_Close(next->mod->share,next);
+			event_Delete(table,connect_chain,next,epoll_fd,next->fd);
+		};
+	};
+};
+
+C_HASH* event_Delete(C_HASH *table,C_DCHAIN *chain,HTTP_CONNECT *connect,int epoll_fd,int fd)
 {
 	struct epoll_event io_event;
 
@@ -184,12 +218,13 @@ C_HASH* event_Delete(C_HASH *table,HTTP_CONNECT *connect,int epoll_fd,int fd)
 		if(errno==ENOENT)ERROR_OUT2_(stderr,ENCODE_("NO IN EPOLLFD\n"));
 		if(errno==EBADF)ERROR_OUT_(stderr,ENCODE_("NO A VALID FD\n"));
 	};
-	hash_Remove(table,connect);
+	hash_Remove(table,&connect);
+	dchain_Remove(connect,chain);
 	
 	return table;
 };
 
-int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
+int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONFIG *config,int listenfd)
 {
 	struct epoll_event *events;
 	int wait_fd;
@@ -208,8 +243,10 @@ int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
 	HTTP_REQUEST request;
 
 	MOD_T head_mod;
+	time_t now_time;
+
 	/*init the head_mod*/
-	head_mod.share=head_Init(512,config->max_head,config->host_list);
+	head_mod.share=head_Init((config->max_head)/2,config->max_head,config->host_list);
 	if(head_mod.share==NULL)goto fail_return;
 	head_mod.mod_Work=&head_Work;
 
@@ -225,10 +262,14 @@ int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
 				ERROR_OUT_(stderr,ENCODE_("TOTAL %d events exist,DOING the %d\n"),wait_fd,i);
 				fake_connect.fd=events[i].data.fd;
 				ERROR_OUT_(stderr,ENCODE_("READY TO GET,FD IS %d\n"),fake_connect.fd);
-				current_connect=(HTTP_CONNECT*)hash_Get(connect_list,&fake_connect);
-				ERROR_OUT_(stderr,ENCODE_("HASH GET DONE\n"));
+				current_connect=&fake_connect;
+				current_connect=*(HTTP_CONNECT**)hash_Get(connect_list,&current_connect);
 				if(current_connect!=NULL)
 				{
+					/*set the event*/
+					current_connect->event=0;
+					if(events[i].events|EPOLLIN)current_connect->event|=WORK_INPUT_;
+					if(events[i].events|EPOLLOUT)current_connect->event|=WORK_OUTPUT_;
 					ERROR_OUT_(stderr,ENCODE_("A EXIST EVENT,IT'S ID IS:%d\n"),current_connect->fd);
 					if(current_connect->fd==listenfd)
 					{
@@ -253,16 +294,11 @@ int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
 							if(errno==ENOBUFS||errno==ENOMEM)ERROR_OUT2_(stderr,ENCODE_("BUF LEAK"));
 							continue;
 						};
-						ERROR_OUT_(stderr,ENCODE_("ACCEPT IS FINISH\n"));
-						event_Add(connect_list,epoll_fd,client_fd,EPOLLIN|EPOLLET,&head_mod);
+						event_Add(connect_list,connect_chain,epoll_fd,client_fd,EPOLLIN|EPOLLET,&head_mod);
 						ERROR_OUT_(stderr,ENCODE_("NEW CONNECT FINISH\n"));
 					}
 					else
 					{
-						if(current_connect->mod==NULL)
-						{
-							ERROR_OUT_(stderr,ENCODE_("AN EMPTY MOD HERE,MUST BE ERROR"));
-						};
 						ERROR_OUT_(stderr,ENCODE_("EVERYTING LOOKS OK,LET'S WORK,FD IS %d\n"),current_connect->fd);
 						if(current_connect->mod==&head_mod)ERROR_OUT_(stderr,ENCODE_("IS HEAD MOD\n"));
 						state=current_connect->mod->mod_Work(current_connect->mod->share,current_connect);
@@ -273,7 +309,7 @@ int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
 							{
 								/*delete the epoll event but not close the port*/
 								ERROR_OUT_(stderr,ENCODE_("CONNECT IS DOWN\n"));
-								event_Delete(connect_list,current_connect,epoll_fd,current_connect->fd);
+								event_Delete(connect_list,connect_chain,current_connect,epoll_fd,current_connect->fd);
 							}
 							else
 							{
@@ -297,7 +333,7 @@ int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd)
 								/*a new port here,understand?*/
 								ERROR_OUT_(stderr,ENCODE_("NEW PORT HERE\n"));
 								state=current_connect->mod->mod_Addport(current_connect->mod->share,current_connect,&addport);
-								event_Add(connect_list,epoll_fd,addport.fd,EPOLLIN|EPOLLET,current_connect->mod);
+								event_Add(connect_list,connect_chain,epoll_fd,addport.fd,EPOLLIN|EPOLLET,current_connect->mod);
 								retry=TRUE_;
 							};
 						}while(retry==TRUE_);
@@ -328,6 +364,7 @@ int main(int argc,char *argv[])
 	/*epoll init*/
 	int epoll_fd;
 	C_HASH connect_list;
+	C_DCHAIN connect_chain;
 
 	/*some options*/
 	int sock_op;
@@ -358,14 +395,15 @@ int main(int argc,char *argv[])
 	
 	/*now create an epoll pool*/
 	epoll_fd=epoll_create(io_config.poll_length);
-	hash_Create(&connect_list,&connect_Tinyhash,&connect_Ensure,sizeof(HTTP_CONNECT),(UINT_)HASH_SPACE_+1);
+	hash_Create(&connect_list,&connect_Tinyhash,&connect_Ensure,sizeof(HTTP_CONNECT*),(UINT_)HASH_SPACE_+1);
+	dchain_Create(&connect_chain,sizeof(HTTP_CONNECT));
 
 	/*add the listen port to list*/
-	event_Add(&connect_list,epoll_fd,listenfd,EPOLLIN,NULL);
+	event_Add(&connect_list,&connect_chain,epoll_fd,listenfd,EPOLLIN,NULL);
 	ERROR_OUT_(stderr,ENCODE_("the listen fd is%d\n"),listenfd);
 
 	/*start epoll loop*/
-	epoll_Loop(&connect_list,epoll_fd,&io_config,listenfd);
+	epoll_Loop(&connect_list,&connect_chain,epoll_fd,&io_config,listenfd);
 
 	fail_return:
 	ERROR_OUT_(stderr,ENCODE_("SOMEWHERE FAIL\n"));

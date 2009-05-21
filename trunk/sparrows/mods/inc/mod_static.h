@@ -20,6 +20,16 @@
 #include <errno.h>
 #include "shttpd_type.h"
 
+#define HTTP_OK_ ENCODE_("HTTP/1.1 200 OK\r\n")
+
+#define HTTP_NOT_FOUND_ ENCODE_("HTTP/1.1 404 NOT FOUND\r\n")
+
+#define HTTP_TYPE_ ENCODE_("Content-Type:%S\r\n")
+
+#define HTTP_LENGTH_ ENCODE_("Content-Length:%lld\r\n")
+
+#define NEW_LINE_ ENCODE_("\r\n")
+
 typedef struct mime
 {
 	C_STRING mime_dot;
@@ -67,6 +77,8 @@ int mod_Select(STATIC_CONFIG *config,HTTP_REQUEST *request,int fd);
 int mod_Work(STATIC_CONFIG *config,HTTP_CONNECT *connect);
 
 int mod_Addport(STATIC_CONFIG *config,HTTP_CONNECT *connect,PORT_APPLY *apply);
+
+void mod_Close(STATIC_CONFIG *config,HTTP_CONNECT *connect);
 
 void mod_Unload(STATIC_CONFIG *config);
 

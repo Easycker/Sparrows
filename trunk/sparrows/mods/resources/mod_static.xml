@@ -14,6 +14,7 @@
 		<mime dot=".jpg" type="image/jpeg"/>
 		<mime dot=".png" type="image/png"/>
 		<mime dot=".tar.gz" type="application/gzip"/>
+		<mime dot=".tar.bz2" type="application/bzip"/>
 		<mime dot=".iso" type="application/octet-stream"/>
 	</mime>
 	<index_page>"index.html"</index_page>

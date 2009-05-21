@@ -5,6 +5,7 @@
 #include <xmlo/xmlo.h>
 #include <cda/c_mem.h>
 #include <cda/c_string.h>
+#include <cda/c_dchain.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -17,6 +18,7 @@
 #include <sys/epoll.h>
 #include <dlfcn.h>
 #include <regex.h>
+#include <time.h>
 #include <errno.h>
 #include "request.h"
 
@@ -32,19 +34,21 @@ typedef struct io_config
 
 IO_CONFIG* io_Init(IO_CONFIG *config,FILE *fp);
 
-UINT_ connect_Tinyhash(HTTP_CONNECT *connect);
+UINT_ connect_Tinyhash(HTTP_CONNECT **connect);
 
-BOOL_ connect_Ensure(HTTP_CONNECT *lhs,HTTP_CONNECT *rhs);
+BOOL_ connect_Ensure(HTTP_CONNECT **lhs,HTTP_CONNECT **rhs);
 
 int fd_Setnonblocking(int fd);
 
-C_HASH* event_Add(C_HASH *table,int epoll_fd,int fd,uint32_t event,MOD_T *mod);
+C_HASH* event_Add(C_HASH *table,C_DCHAIN *chain,int epoll_fd,int fd,uint32_t event,MOD_T *mod);
 
 void event_Mod(int epoll_fd,int fd,uint32_t event);
 
-C_HASH* event_Delete(C_HASH *table,HTTP_CONNECT *connect,int epoll_fd,int fd);
+void event_Active(C_HASH *table,C_DCHAIN *connect_chain,HTTP_CONNECT *connect,int epoll_fd);
 
-int epoll_Loop(C_HASH *connect_list,int epoll_fd,IO_CONFIG *config,int listenfd);
+C_HASH* event_Delete(C_HASH *table,C_DCHAIN *chain,HTTP_CONNECT *connect,int epoll_fd,int fd);
+
+int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONFIG *config,int listenfd);
 
 int main(int argc,char *argv[]);
 
