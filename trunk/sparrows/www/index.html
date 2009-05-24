@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<title>sparrows</title>
+	</head>
+	<body>
+		It works!<p>
+		主程序流程：<p>
+			程序开始(io_epoll:317)<p>
+				|<p>
+			读取配置文件(io_epoll:334)<p>
+				|<p>
+			监听http 端口(io_epoll:350)<p>
+				|<p>
+			设置监听socket 参数(io_epoll:355)<p>
+				|<p>
+			把监听socket 描述符加入epoll 队列与连接散列(io_epoll:358)<p>
+				|<p>
+			主循环：开始epoll 事件循环(io_epoll:366)<p>
+				|<p>
+			监听到IO事件？(io_epoll:218)<p>
+			/		\<p>
+		是(io_epoll:219)	否，继续等待<p>
+			|<p>
+		循环处理事件(io_epoll:221)<p>
+			|<p>
+		是监听socket？(io_epoll:231)<p>
+		/			\<p>
+	是(io_epoll:233)		否(io_epoll:258)<p>
+		|					\<p>
+开始三步握手，Accept 请求(io_epoll:247)			请求头接收状态？(io_epoll:265)<p>
+		|						/		\<p>
+将新socket 描述符加入epoll 队列(io_epoll:255)			是		否<p>
+并设置为请求头接收状态						|		|<p>
+		|					接收请求头并分析，	响应模块进行响应(io_epoll:266)<p>
+	返回主循环					接收完毕后送交模块	|<p>
+							选择单元，选择响应	处理响应结果(io_epoll:267)<p>
+							模块(io_epoll:266)	|<p>
+								|		返回主循环<p>
+							返回主循环<p>
+	</body>
+</html>
