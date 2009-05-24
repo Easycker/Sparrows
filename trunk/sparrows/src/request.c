@@ -97,6 +97,7 @@ HTTP_REQUEST* request_Head(HTTP_REQUEST *request,C_ARRAY CHAR_* const string)
 	if(string_Kprepare(&search_key,ENCODE_("Connection: "))==NULL)goto fail_return;
 	op=string_Knsearch(string,&search_key,array_Length(string));
 	string_Kfree(&search_key);
+	request->alive=FALSE_;
 	if(op!=NULL)
 	{
 		if(*(op+12)==ENCODE_('K'))request->alive=TRUE_;
@@ -149,6 +150,7 @@ void request_Free(HTTP_REQUEST *request,HEAD_SHARE *head_share)
 
 UINT_ head_Tinyhash(HEAD_FD *head)
 {
+	ERROR_OUT_(stderr,ENCODE_("CALL HEAD_TINYHASH FOR ONCE\n"));
 	return head->fd&HASH_SPACE_;
 };
 
@@ -306,5 +308,10 @@ fail_return:
 
 void head_Close(HEAD_SHARE *share,HTTP_CONNECT *connect)
 {
-	/*nothing to do*/
+	HEAD_FD fake_head;
+	HEAD_FD *head;
+
+	fake_head.fd=connect->fd;
+	head=hash_Get(&share->fd_list,&fake_head);
+	if(head!=NULL)hash_Remove(&share->fd_list,head);
 };

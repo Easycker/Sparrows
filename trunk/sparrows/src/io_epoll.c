@@ -372,9 +372,9 @@ int epoll_Loop(C_HASH *connect_list,C_DCHAIN *connect_chain,int epoll_fd,IO_CONF
 			};
 		};
 		/*things after epoll_wait*/
-		time(&now_time);
 		if(timeout_connect!=NULL)
 		{
+			time(&now_time);
 			ERROR_OUT_(stderr,ENCODE_("TIMEOUT HAD BEEN SET\n"));
 			if((((now_time-timeout_connect->last_op)>config->keep_alive)&&(timeout_connect->op_done==TRUE_))||((now_time-timeout_connect->last_op)>config->timeout))
 			{
