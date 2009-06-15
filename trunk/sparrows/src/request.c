@@ -130,7 +130,6 @@ void request_Free(HTTP_REQUEST *request,HEAD_SHARE *head_share)
 
 UINT_ head_Tinyhash(HEAD_FD *head)
 {
-	ERROR_OUT_(stderr,ENCODE_("CALL HEAD_TINYHASH FOR ONCE\n"));
 	return head->fd&HASH_SPACE_;
 };
 
@@ -297,4 +296,5 @@ int head_Close(HEAD_SHARE *share,HTTP_CONNECT *connect)
 	fake_head.fd=connect->fd;
 	head=hash_Get(&share->fd_list,&fake_head);
 	if(head!=NULL)hash_Remove(&share->fd_list,head);
+	return 0;
 };

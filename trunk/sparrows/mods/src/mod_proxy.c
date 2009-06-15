@@ -123,8 +123,17 @@ int mod_Select(PROXY_CONFIG *config,HTTP_REQUEST *request,int fd)
 					connect_owner.remote_write=FALSE_;
 					/*connect_owner.last_op=LOCAL_SEND_REMOTE_;*/
 					connect_owner.last_op=CONNECTING_;
-					if(pipe(connect_owner.buf_fd)<0)goto fail_return;
-					if((len=write(connect_owner.buf_fd[1],request->recv_data,request->recv_len))<0)goto fail_return;
+					if(pipe(connect_owner.buf_fd)<0)
+					{
+						ERROR_OUT_(stderr,ENCODE_("FAIL WHILE CREATE PIPE\n"));
+						goto fail_return;
+					};
+					ERROR_OUT_(stderr,ENCODE_("PIPE CREATED\n"));
+					if((len=write(connect_owner.buf_fd[1],request->recv_data,request->recv_len))<0)
+					{
+						ERROR_OUT_(stderr,ENCODE_("FAIL WHILE WRITE PIPE\n"));
+						goto fail_return;
+					};
 					connect_owner.len=len;
 					id_owner=dchain_Append(&connect_owner,&config->owner_list);
 					connect_id.owner=id_owner;
@@ -140,6 +149,7 @@ int mod_Select(PROXY_CONFIG *config,HTTP_REQUEST *request,int fd)
 						ERROR_OUT_(stderr,ENCODE_("ERROR WHILE APPEND ID\n"));
 						goto fail_return;
 					};
+					ERROR_OUT_(stderr,ENCODE_("BUILD UP CONNECT DONE!,remote_fd is %d,in_fd is %d,owner's remote_fd is %d,owner's in_fd is %d\n"),remote_fd,fd,connect_id.owner->remote_fd,connect_id.owner->in_fd);
 					config->new_fd=remote_fd;
 					array_Drop(&cache_ansi);
 					ERROR_OUT_(stderr,ENCODE_("BUILD UP PROXY\n"));
@@ -288,7 +298,7 @@ int mod_Work(PROXY_CONFIG *config,HTTP_CONNECT *connect)
 						id->owner->len-=len;
 					}while(len>0);
 				}
-				else
+				if(1)
 				{
 					while(1)
 					{
@@ -385,7 +395,7 @@ int mod_Work(PROXY_CONFIG *config,HTTP_CONNECT *connect)
 							id->owner->len-=len;
 						}while(len>0);
 					}
-					else
+					if(1)
 					{
 						ERROR_OUT_(stderr,ENCODE_("REMOTE LOOP START\n"));
 						while(1)
@@ -520,8 +530,11 @@ int mod_Close(PROXY_CONFIG *config,HTTP_CONNECT *connect)
 		close(id->owner->remote_fd);
 		close(id->owner->in_fd);
 		*/
-		close(id->owner->buf_fd[0]);
-		close(id->owner->buf_fd[1]);
+		ERROR_OUT_(stderr,ENCODE_("CLOSEING PIPE\n"));
+		if(close(id->owner->buf_fd[0])<0||close(id->owner->buf_fd[1])<0)
+		{
+			ERROR_OUT_(stderr,ENCODE_("FAIL WHILE CLOSE PIPE\n"));
+		};
 		fake_id.fd=id->owner->remote_fd;
 		if((remote_id=hash_Get(&config->id_list,&fake_id))==NULL)
 		{
@@ -540,6 +553,7 @@ int mod_Close(PROXY_CONFIG *config,HTTP_CONNECT *connect)
 	return 0;
 fail_return:
 	ERROR_OUT_(stderr,ENCODE_("CONNECT ID ISN'T IN OWNER\n"));
+	exit(1);
 	ERROR_PRINT_;
 	return 0;
 };
