@@ -488,6 +488,7 @@ int main(int argc,char *argv[])
 	};
 
 	signal(SIGPIPE,SIG_IGN);
+	signal(SIGCHLD,SIG_IGN);
 	signal(SIGINT,&sig_Int);
 	if((listenfd=socket(AF_INET,SOCK_STREAM,0))==-1)goto fail_return;
 	sock_op=1;

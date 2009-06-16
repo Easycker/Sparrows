@@ -1,8 +1,8 @@
 #ifndef SHTTPD_TYPE_H
 #define SHTTPD_TYPE_H
 
-#define DEBUG_
-#define DEBUG2_
+/*#define DEBUG_
+#define DEBUG2_*/
 #ifdef DEBUG_
 #define ERROR_OUT_ FPRINTF_
 #else

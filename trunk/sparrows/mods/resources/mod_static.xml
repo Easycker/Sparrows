@@ -17,5 +17,5 @@
 		<mime dot=".iso" type="application/octet-stream"/>
 	</mime>
 	<index_page>"index.html"</index_page>
-	<buf_size>32768</buf_size>
+	<buf_size>2048</buf_size>
 </mod_static>
