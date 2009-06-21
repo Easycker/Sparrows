@@ -1,0 +1,52 @@
+sparrows 详细设计
+
+一、主要目录结构：
+	sparrows/
+		inc/
+			io_epoll.h	事件处理头文件
+			request.h	请求处理头文件
+			shttpd_type.h	通用定义头文件，亦为模块所使用
+		src/
+			io_epoll.c	事件处理实现
+			request.c	请求处理实现
+		resource/
+			config.xml	范例配置文件
+		doc/
+			...		文档，正在补全中
+		mods/
+			inc/
+				mod_static.h	静态文件模块头文件
+				mod_proxy.h	反向代理模块头文件
+				mod_rewrite.h	URL重写模块头文件
+				mod_cgi.h	CGI模块头文件
+			src/
+				mod_static.c	静态文件模块实现
+				mod_proxy.c	反向代理模块实现
+				mod_rewrite.c	URL重写模块实现
+				mod_cgi.c	CGI模块头实现
+			resources/
+				mod_static.xml	静态文件模块范例配置文件
+				mod_proxy.xml	反向代理模块范例配置文件
+				mod_rewrite.xml	URL重写模块范例配置文件
+				mod_cgi.xml	CGI模块范例配置文件
+
+二、原理实现
+	本服务器的工作基于IO事件驱动，由epoll 来管理事件，主程序进行请求分析，模块进行响应。
+
+三、总体流程
+	1：主程序 —— 读配置
+	2：主程序 —— 监听端口
+	3：主程序 —— 接收请求
+	4：主程序 —— 分析请求
+	5：主程序 —— 选择模块
+	6：模块 —— 发送数据直到不可写或阻塞（继而处理下一连接）
+	7：主程序 —— 通知模块连接可写（当可写时）
+	8：模块 —— 继续发送
+	9：发送完毕
+	10：主程序 —— 关闭端口，回到步骤3
+
+四、主程序流程图
+	请参见flowchart
+
+五、模块流程图
+	参见mods/（空缺中）

@@ -1,0 +1,7 @@
+<mod_cgi>
+	<dirs>
+		<dir regex="/cgi-bin/" root="www"/>
+	</dirs>
+	<index_page>"index.sh"</index_page>
+	<buf_size>2048</buf_size>
+</mod_cgi>

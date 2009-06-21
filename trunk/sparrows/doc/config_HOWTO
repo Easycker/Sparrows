@@ -1,0 +1,46 @@
+配置文件编写方法：
+	主配置文件：
+	<config>
+		http_interface 块，指定监听的网络界面，0 代表所有
+		<http_interface>0</http_interface>
+		http_port 块，指定监听的端口，1024 以下的端口需要root 权限
+		<http_port>8805</http_port>
+		io_buf 块，指定接收请求的缓冲大小
+		<io_buf>8192</io_buf>
+		pool_length 块，连结池大小，与listen 的backlog 有关，最大等待队列数
+		<pool_length>8192</pool_length>
+		max_header 块，允许的最大http 头部
+		<max_header>2048</max_header>
+		pool_timeout 块，等待事件的最长时间，影响超时的检测
+		<pool_timeout>1000</pool_timeout>
+		keep_alive 块，keep-alive 的最长等待时间，0 代表关闭keep-alive
+		<keep_alive>5</keep_alive>
+		timeout 块，连接的最长等待时间，即超时
+		<timeout>30</timeout>
+		hosts 块，虚拟主机的设置
+		<hosts>
+			虚拟主机名
+			<localhost>
+				用于与Host匹配的正则表达式，当匹配时使用此主机
+				<regex>"localhost"</regex>
+				此主机使用的模块
+				<mods>
+					模块名 path=路径 arg=参数
+					<mod_static path="mods/mod_static.so" arg="mods/resources/mod_static.xml"/>
+					<mod_proxy path="mods/mod_proxy.so" arg="mods/resources/mod_proxy.xml"/>
+				</mods>
+			</localhost>
+			<127.0.0.1>
+				<regex>"127.0.0.1"</regex>
+				<mods>
+					<mod_static path="mods/mod_static.so" arg="mods/resources/mod_static.xml"/>
+				</mods>
+			</127.0.0.1>
+			<192.168.168.210>
+				<regex>"192.168.168.210"</regex>
+				<mods>
+					<mod_static path="mods/mod_static.so" arg="mods/resources/mod_static.xml"/>
+				</mods>
+			</192.168.168.210>
+		</hosts>
+	</config>
