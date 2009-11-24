@@ -1,3 +1,0 @@
-<mod_rewrite>
-	<rewrite regex="abc" replace="home"/>
-</mod_rewrite>
