@@ -1,0 +1,66 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.61)
+AC_INIT(sparrows, 0.2, monan@21cn.com)
+#AC_CONFIG_SRCDIR([inc/])
+AM_CONFIG_HEADER(inc/config.h)
+AM_INIT_AUTOMAKE(sparrows,0.2)
+
+# Checks for programs.
+AC_PROG_CC
+AM_PROG_CC_C_O
+
+AC_ARG_ENABLE([debug],
+	      [AS_HELP_STRING([--enable-debug],
+	      [enable debug verbose output])],
+	      [debug_enable="yes"],
+	      [])
+
+AC_ARG_ENABLE([sendfile],
+	      [AS_HELP_STRING([--enable-sendfile],
+	      [enable linux sendfile support])],
+	      [sendfile_enable="yes"],
+	      [])
+
+AC_ARG_WITH([iomodel],
+	    [AS_HELP_STRING([--with-iomodel=select|epoll],
+			    [use select or epoll as io model])],
+	    [with_model=$withval],
+	    )
+
+if test -n "$debug_enable";then
+	AC_DEFINE([DEBUG_ENABLE],[],[enable debug output])
+fi
+
+if test -n "$sendfile_enable";then
+	AC_DEFINE([SENDFILE_ENABLE],[],[enable sendfile])
+fi
+
+if test -n "$with_model";then
+	if test $with_model = "epoll";then
+		AC_DEFINE([USE_EPOLL],[],[use epoll])
+	else
+		AC_DEFINE([USE_SELECT],[],[use select])
+	fi
+else
+	AC_DEFINE([USE_SELECT],[],[use select])
+fi
+
+# Checks for libraries.
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([stdlib.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_TYPE_SIZE_T
+
+# Ok now it's time to generate Makefile.am
+
+# Checks for library functions.
+
+AC_CONFIG_FILES([
+		 Makefile
+		 ])
+AC_OUTPUT
