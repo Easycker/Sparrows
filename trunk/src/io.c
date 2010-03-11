@@ -511,7 +511,7 @@ int main(int argc,char *argv[])
 		
 		if((fp=fopen(argv[1],"r"))<=0)
 		{
-			printf("ERROR: %s not founded,is it really there?\n",argv[1]);
+			/*printf("ERROR: %s not founded,is it really there?\n",argv[1]);*/
 			return 1;
 		};
 		io_config.config_path=string_Create_Ex(argv[1]);
